@@ -23,8 +23,13 @@ export = (api: API) => {
 class Zone {
   public zoneId: number;
   public zoneName: string;
-  public zoneSwitch: Service.Switch;
+  public zoneSwitch: Switch;
 
+  constructor() {
+    zoneId = 0;
+    zoneName = "";
+    zoneSwitch = null;
+  }
 }
 
 class Airtouch3Airconditioner implements AccessoryPlugin {
@@ -102,7 +107,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
 
     //zones
     //Get zone list via API first, then create one switch per zone
-   config.zones.map(zone => {
+   config.zones.map(zone<Zone> => {
       let objZone = new Zone;
       objZone.zoneId = zone.zoneId;
       objZone.zoneName = zone.zoneName;
