@@ -20,11 +20,19 @@ export = (api: API) => {
   api.registerAccessory("homebridge-airtouch3-airconditioner", Airtouch3Airconditioner);
 };
 
+class Zone {
+  public zoneId: number;
+  public zoneName: string;
+  public zoneSwitch: Service.Switch;
+
+}
+
 class Airtouch3Airconditioner implements AccessoryPlugin {
 
   private readonly log: Logging;
   private readonly name: string;
   private readonly apiRoot: string
+  private zoneSwitches: Array<Zone>
   private switchOn = false;
   private coolingTemperature = 24;
   private heatingTemperature = 15;
@@ -39,12 +47,12 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     this.apiRoot = config.apiRoot;
     if (config.airConId) {
         this.log.debug("Selecting override airconditioner ID: " + config.airConId);
-	this.airConId = config.airConId;
+	      this.airConId = config.airConId;
     }
 
 
     // create a new Heater Cooler service
-      this.service = new hap.Service.HeaterCooler(this.name);
+    this.service = new hap.Service.HeaterCooler(this.name);
 
       // create handlers for required characteristics
       this.service.getCharacteristic(hap.Characteristic.Active)
@@ -91,6 +99,27 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
         .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
                 this.handleHeatingTemperatureSet(callback, value as string);
         })
+
+    //zones
+    //Get zone list via API first, then create one switch per zone
+   config.zones.map(zone => {
+      let objZone = new Zone;
+      objZone.zoneId = zone.zoneId;
+      objZone.zoneName = zone.zoneName;
+      objZone.zoneSwitch = new hap.Service.Switch(objZone.zoneName);
+
+      objZone.zoneSwitch.getCharacteristic(hap.Characteristic.On)
+      .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
+        log.info("Current state of the switch was returned: ");
+        callback(undefined, true);
+      })
+      .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+        log.info("Switch state was set to: " );
+        callback();
+      });
+
+      this.zones.push(objZone);
+   })
 
 
     this.informationService = new hap.Service.AccessoryInformation()
@@ -192,7 +221,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
 
   handleCoolingTemperatureGet(callback: Function) : void {
     this.log.debug('Triggered GET CoolingTemperature');
-   
+
     const url = this.apiRoot + "/api/aircons";
     axios.get(url)
         .then((response: AxiosResponse) => {
@@ -200,7 +229,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
             this.log.debug("Current room temperature is: " + temp);
             callback(undefined, Number(temp));
         });
-   
+
   }
 
   handleHeatingTemperatureGet(callback: Function) : void {
@@ -271,7 +300,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
         }
 
         return temperature;
-   } 
+   }
    /*************************************************/
 
 
@@ -288,10 +317,14 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
    * It should return all services which should be added to the accessory.
    */
   getServices(): Service[] {
-    return [
-      this.informationService,
-      this.service,
-    ];
+    let serviceArray = new Array<Service>;
+    serviceArray.push(this.informationService);
+    serviceArray.push(this.service);
+
+    //Add zone switches..
+    this.zoneSwitches.map(zone => serviceArray.push(zone));
+
+    return serviceArray;
   }
 
 }
