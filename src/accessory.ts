@@ -317,7 +317,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
    * It should return all services which should be added to the accessory.
    */
   getServices(): Service[] {
-    let serviceArray = new Array<Service>;
+    let serviceArray = new Array<Service>();
     serviceArray.push(this.informationService);
     serviceArray.push(this.service);
 
