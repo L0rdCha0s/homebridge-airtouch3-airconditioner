@@ -35,7 +35,7 @@ Configuration is as follows:
 
 *Notes*:
 
-1. You'll need one zone entry in the configuration file per zone you want to expose to Homekit.  Zone IDs are 0-indexed.  If you visit http://<vzduch-dotek-api>:<port>/api/aircons , you'll see a list of your zones in the returned JSON.
+1. You'll need one zone entry in the configuration file per zone you want to expose to Homekit.  Zone IDs are 0-indexed.  If you visit http://vzduch-dotek-api:port/api/aircons , you'll see a list of your zones in the returned JSON.
 2. Temperature setting is currently *global* - all zones will be set to the temperature you select in HomeKit
 
 
