@@ -8,7 +8,7 @@ import {
   CharacteristicValue,
   HAP,
   Logging,
-  Service
+  Service,
 } from "homebridge";
 
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosPromise } from 'axios';
@@ -23,12 +23,12 @@ export = (api: API) => {
 class Zone {
   public zoneId: number;
   public zoneName: string;
-  public zoneSwitch: Switch;
+  public zoneSwitch: Service;
 
-  constructor() {
-    zoneId = 0;
-    zoneName = "";
-    zoneSwitch = null;
+  constructor(id: number, name: string) {
+    this.zoneId = id;
+    this.zoneName = name;
+    this.zoneSwitch = new hap.Service.Switch(name, name.replace(" ",""));
   }
 }
 
@@ -50,6 +50,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     this.log = log;
     this.name = config.name;
     this.apiRoot = config.apiRoot;
+    this.zoneSwitches = new Array<Zone>();	  
     if (config.airConId) {
         this.log.debug("Selecting override airconditioner ID: " + config.airConId);
 	      this.airConId = config.airConId;
@@ -107,11 +108,8 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
 
     //zones
     //Get zone list via API first, then create one switch per zone
-   config.zones.map(zone<Zone> => {
-      let objZone = new Zone;
-      objZone.zoneId = zone.zoneId;
-      objZone.zoneName = zone.zoneName;
-      objZone.zoneSwitch = new hap.Service.Switch(objZone.zoneName);
+    config.zones.map((zone : any) => {
+      let objZone = new Zone(zone.zoneId, zone.name);
 
       objZone.zoneSwitch.getCharacteristic(hap.Characteristic.On)
       .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
@@ -123,7 +121,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
         callback();
       });
 
-      this.zones.push(objZone);
+      this.zoneSwitches.push(objZone);
    })
 
 
@@ -327,7 +325,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     serviceArray.push(this.service);
 
     //Add zone switches..
-    this.zoneSwitches.map(zone => serviceArray.push(zone));
+    this.zoneSwitches.map(zone => serviceArray.push(zone.zoneSwitch));
 
     return serviceArray;
   }
