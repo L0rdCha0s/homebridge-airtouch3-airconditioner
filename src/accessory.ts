@@ -273,26 +273,24 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   handleCoolingTemperatureGet(callback: Function) : void {
     this.log.debug('Triggered GET CoolingTemperature');
 
-    const url = this.apiRoot + "/api/aircons";
-    axios.get(url)
-    .then((response: AxiosResponse) => {
-      const temp = response.data.aircons[this.airConId].desiredTemperature;
-      this.log.debug("Current room temperature is: " + temp);
-      callback(undefined, Number(temp));
-    });
+    if (this.aircon != undefined) {
+      callback(undefined, this.aircon.desiredTemperature);
+    } else {
+      this.log.debug("No aircon state currently, returning 0");
+      callback(undefined, 0);
+    }
 
   }
 
   handleHeatingTemperatureGet(callback: Function) : void {
     this.log.debug('Triggered GET HeatingTemperature');
 
-    const url = this.apiRoot + "/api/aircons";
-    axios.get(url)
-    .then((response: AxiosResponse) => {
-      const temp = response.data.aircons[this.airConId].desiredTemperature;
-      this.log.debug("Current room temperature is: " + temp);
-      callback(undefined, Number(temp));
-    });
+    if (this.aircon != undefined) {
+      callback(undefined, this.aircon.desiredTemperature);
+    } else {
+      this.log.debug("No aircon state currently, returning 0");
+      callback(undefined, 0);
+    }
   }
 
   handleCoolingTemperatureSet(callback: Function, value: string) : void {

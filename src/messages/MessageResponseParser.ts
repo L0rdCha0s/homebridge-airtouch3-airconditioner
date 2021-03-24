@@ -88,6 +88,9 @@ export class MessageResponseParser {
     aircon.roomTemperature = this.responseBuffer[this.RoomTemperature];
     this.log.info("Room temperature is: " + aircon.roomTemperature);
 
+    //All except most significant bit
+    aircon.desiredTemperature = this.responseBuffer[this.DesiredTemperature] & 127;
+
     aircon.zones = this.parseZones();
 
     return aircon;

@@ -22,6 +22,7 @@ export class Aircon {
     this._zones = new Array<Zone>();
     this._status = false;
     this._roomTemperature = 0;
+    this._desiredTemperature = 0;
   }
 
   private _roomTemperature : number;
@@ -30,6 +31,14 @@ export class Aircon {
   }
   public set roomTemperature(v : number) {
     this._roomTemperature = v;
+  }
+
+  private _desiredTemperature : number;
+  public get desiredTemperature() : number {
+    return this._desiredTemperature;
+  }
+  public set desiredTemperature(v : number) {
+    this._desiredTemperature = v;
   }
 
 
