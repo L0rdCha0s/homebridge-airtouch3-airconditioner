@@ -18,7 +18,7 @@ import PromiseWritable from "promise-writable"
 import { AirTouchMessage } from "./messages/AirTouchMessage";
 import { MessageResponseParser } from "./messages/MessageResponseParser"
 import { Aircon } from "./messages/Aircon"
-import { AcMode } from "./enums/AcMode"
+import { AcMode } from "./messages/enums/AcMode"
 
 let hap: HAP;
 
