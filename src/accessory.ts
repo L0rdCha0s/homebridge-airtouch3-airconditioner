@@ -128,19 +128,24 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
       objZone.zoneSwitch.getCharacteristic(hap.Characteristic.On)
       .on(CharacteristicEventTypes.GET, async (callback: CharacteristicGetCallback) => {
 
-        const url = this.apiRoot + "/api/aircons";
-        this.log.debug("Getting values from: "  + url);
+        if (aircons != undefined) {
 
-        axios.get(url)
-        .then((response: AxiosResponse) => {
-	  const activeState = response.data.aircons[this.airConId].zones[zone.zoneId].status;
-          this.log("Zone status for '" + zone.name + "' from API is: " + activeState);
-          if (activeState == "1") {
-            callback(undefined, true);
+          let zoneObj = this.aircon.zones[zone.zoneId];
+          if (zoneObj != undefined) {
+            let activeState = zoneObj.status;
+            this.log("Zone status for '" + zone.name + "' from API is: " + activeState);
+            if (activeState) {
+              callback(undefined, true);
+            } else {
+              callback(undefined, false);
+            }
           } else {
-            callback(undefined, false);
+            this.log.info("Invalid zone id: " + zone.zoneId);
           }
-        });
+        } else {
+          this.log.info("No current status from aircon, assuming zone is off");
+          callback(undefined, false);
+        }
       })
       .on(CharacteristicEventTypes.SET, async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
         log.info("Zone '" + zone.name + "' state was set to: " + value);
