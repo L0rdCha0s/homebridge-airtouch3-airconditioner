@@ -1,6 +1,6 @@
 {
   "name": "homebridge-airtouch3-airconditioner",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "An integration with the vzduch-dotek AirTouch v3 API",
   "main": "dist/accessory.js",
   "scripts": {
