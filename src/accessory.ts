@@ -231,10 +231,17 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   handleCurrentHeaterCoolerStateGet(callback: Function) : void {
     this.log.debug('Triggered GET CurrentHeaterCoolerState');
 
-    // set this to a valid value for CurrentHeaterCoolerState
-    const currentValue = hap.Characteristic.CurrentHeaterCoolerState.COOLING;
+    if (this.aircon != undefined) {
+      let mode = this.aircon.mode;
+      if (mode == AcMode.COOL) {
+        mode = 2; //Airtouch modes overlap 1-1, except for cool -which is '2' not '4'
+      }
+      callback(undefined, mode);
+    } else {
+      this.log.debug("No aircon state currently, returning 0");
+      callback(undefined, hap.Characteristic.TargetHeaterCoolerState.AUTO);
+    }
 
-    callback(undefined, currentValue);
   }
 
 
@@ -252,10 +259,9 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
       callback(undefined, mode);
     } else {
       this.log.debug("No aircon state currently, returning 0");
-      callback(undefined, hap.characteristic.TargetHeaterCoolerState.AUTO);
+      callback(undefined, hap.Characteristic.TargetHeaterCoolerState.AUTO);
     }
 
-    callback(undefined, currentValue);
   }
 
   /**

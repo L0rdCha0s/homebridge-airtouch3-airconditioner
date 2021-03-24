@@ -1,6 +1,6 @@
 import { Zone } from "./Zone"
 import { Sensor } from "./Sensor"
-import { AcMode } from "./enums/AcMode"
+import { AcMode } from "./messages/enums/AcMode"
 
 export class Aircon {
   private _zones : Array<Zone>;
