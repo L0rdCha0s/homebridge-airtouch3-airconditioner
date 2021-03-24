@@ -40,12 +40,13 @@ class Zone {
 class Airtouch3Airconditioner implements AccessoryPlugin {
 
   private readonly log: Logging;
+  private socket: Socket;
   private readonly name: string;
   private readonly apiRoot: string
   private zoneSwitches: Array<Zone>
   private switchOn = false;
   private coolingTemperature = 24;
-  private heatingTemperature = 15; 
+  private heatingTemperature = 15;
   private airConId = 0;
   private airtouchHost : string;
   private airtouchPort : number;
@@ -64,7 +65,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
       this.airConId = config.airConId;
     }
     this.airtouchHost = config.airtouchHost;
-    this.airtouchPort = config.airtouchPort;	    
+    this.airtouchPort = config.airtouchPort;
 
 
 
@@ -354,6 +355,36 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     this.zoneSwitches.map(zone => serviceArray.push(zone.zoneSwitch));
 
     return serviceArray;
+  }
+
+  async function connectToServer() : Promise<void> {
+    this.socket = new net.Socket()
+    const promiseSocket = new PromiseSocket(socket)
+    // promiseSocket.setTimeout(1000);
+    await promiseSocket.connect(this.airtouchPort, this.airtouchHost)
+
+    console.log("Connected to airtouch at " + this.airtouchHost + ":" + this.airtouchPort);
+
+    this.socket.on('data', function(data) {
+    	console.log('Received: ' + data.length);
+
+      let messageResponseParser = new MessageResponseParser(new Int8Array(data.buffer));
+      messageResponseParser.parse();
+    });
+
+    this.socket.on('close', async function(e) {
+      console.log("********************************** AirTouch3 disconnected, reconnecting..");
+      await promiseSocket.connect(port, ip);
+    });
+
+    //Timer to send init message
+    setInterval(async () => {
+        await sendInit(promiseSocket);
+    }, 60000);
+
+    //Send an initial handshake
+    await sendInit(promiseSocket);
+
   }
 
 }
