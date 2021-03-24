@@ -210,9 +210,11 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
       setTimeout(() => {
           this.antiFlap = false;
       }, 2000);
+    } else {
+      this.log.info("Anti-flap triggered");
     }
 
-    callback(undefined);
+    callback();
 
     // this.log.info(this.stackTrace());
   }
