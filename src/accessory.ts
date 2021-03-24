@@ -263,7 +263,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   handleCurrentTemperatureGet(callback: Function) : void {
     this.log.debug('Triggered GET CurrentTemperature');
     if (this.aircon != undefined) {
-      callback(undefined, airco.roomTemperature);
+      callback(undefined, aircon.roomTemperature);
     } else {
       this.log.debug("No aircon state currently, returning 0");
       callback(undefined, 0);
