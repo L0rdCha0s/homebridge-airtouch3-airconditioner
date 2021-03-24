@@ -365,7 +365,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
 
     console.log("Connected to airtouch at " + this.airtouchHost + ":" + this.airtouchPort);
 
-    this.socket.on('data', function(data: ) {
+    this.socket.on('data', function(data) {
     	console.log('Received: ' + data.length);
 
       let messageResponseParser = new MessageResponseParser(new Int8Array(data.buffer));
