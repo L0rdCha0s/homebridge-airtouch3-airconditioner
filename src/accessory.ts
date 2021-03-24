@@ -41,6 +41,7 @@ class Zone {
 class Airtouch3Airconditioner implements AccessoryPlugin {
 
   private readonly log: Logging;
+  private antiFlap: boolean;
   private socket: net.Socket = new net.Socket();
   private promiseSocket: PromiseSocket<net.Socket> = new PromiseSocket(this.socket);
   private readonly name: string;
@@ -187,24 +188,33 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   */
   async handleActiveSet(callback: Function, value: string) : Promise<void> {
     this.log.debug('Triggered SET Active:' + value);
-    if (value == "1") {
-        if (!this.aircon!.status) {
-          await this.sendToggleAC();
-          this.log.debug("Air Conditioner turn on");
-        } else {
-          this.log.debug("Air Conditioner already on!");
-        }
-    } else {
-      if (this.aircon!.status) {
-        await this.sendToggleAC();
-        this.log.debug("Air Conditioner turn off");
+
+    if (!this.antiFlap) {
+      if (value == "1") {
+          if (!this.aircon!.status) {
+            await this.sendToggleAC();
+            this.log.debug("Air Conditioner turn on");
+          } else {
+            this.log.debug("Air Conditioner already on!");
+          }
       } else {
-        this.log.debug("Air Conditioner already off!");
+        if (this.aircon!.status) {
+          await this.sendToggleAC();
+          this.log.debug("Air Conditioner turn off");
+        } else {
+          this.log.debug("Air Conditioner already off!");
+        }
       }
+
+      this.antiFlap = true;
+      setTimeout(() => {
+          this.antiFlap = false;
+      }, 2000);
     }
+
     callback(undefined);
 
-    this.log.info(this.stackTrace());
+    // this.log.info(this.stackTrace());
   }
 
   /**
