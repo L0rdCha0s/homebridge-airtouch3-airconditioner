@@ -17,6 +17,7 @@ import PromiseSocket from "promise-socket"
 import PromiseWritable from "promise-writable"
 import { AirTouchMessage } from "./messages/AirTouchMessage";
 import { MessageResponseParser } from "./messages/MessageResponseParser"
+import { Aircon } from "./messages/Aircon"
 
 let hap: HAP;
 
@@ -365,17 +366,17 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     // promiseSocket.setTimeout(1000);
     await promiseSocket.connect(this.airtouchPort, this.airtouchHost)
 
-    console.log("Connected to airtouch at " + this.airtouchHost + ":" + this.airtouchPort);
+    log.info("Connected to airtouch at " + this.airtouchHost + ":" + this.airtouchPort);
 
     this.socket.on('data', (data) => {
-    	console.log('Received: ' + data.length);
+    	log.info('Received: ' + data.length);
 
-      let messageResponseParser = new MessageResponseParser(new Int8Array(data.buffer));
+      let messageResponseParser = new MessageResponseParser(new Int8Array(data.buffer), this.log);
       messageResponseParser.parse();
     });
 
     this.socket.on('close', async (e) => {
-      console.log("********************************** AirTouch3 disconnected, reconnecting..");
+      log.info("********************************** AirTouch3 disconnected, reconnecting..");
       await promiseSocket.connect(this.airtouchPort, this.airtouchHost);
     });
 
@@ -390,12 +391,12 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   }
 
   async sendInit(promiseSocket : PromiseSocket<net.Socket>) {
-    console.log("Sending init..");
-    let bufferTest = new AirTouchMessage();
+    log.info("Sending init..");
+    let bufferTest = new AirTouchMessage(this.log);
     bufferTest.getInitMsg();
     bufferTest.printHexCode();
     const total = await promiseSocket.write(Buffer.from(bufferTest.buffer.buffer));
-    console.log("Bytes written: " + total);
+    log.info("Bytes written: " + total);
 }
 
 }

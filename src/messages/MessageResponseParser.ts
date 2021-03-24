@@ -2,6 +2,9 @@ import { MessageConstants } from "./MessageConstants"
 import { ZoneStatus } from "./enums/ZoneStatus"
 import { Zone } from "./Zone"
 import { Aircon } from "./Aircon"
+import {
+  Logging
+} from "homebridge";
 
 export class MessageResponseParser {
   readonly GroupNameStart : number = 104;
@@ -25,9 +28,11 @@ export class MessageResponseParser {
   readonly AirTouchIdStart = 483;
 
   responseBuffer: Int8Array;
+  log: Logging
 
-  constructor(responseBuffer: Int8Array) {
+  constructor(responseBuffer: Int8Array, log: Logging) {
     this.responseBuffer = responseBuffer;
+    this.log = log;
   }
 
   private isPrint(aChar : string) : boolean {
@@ -44,7 +49,7 @@ export class MessageResponseParser {
   private fromBytesInt32(arr) : number {
     var result=0;
     for (let i=3;i>=0;i--) {
-        console.log("Byte is: " + arr[i]);
+        this.log.info("Byte is: " + arr[i]);
         result+=arr[3-i]<<(8*i);
     }
     return result;
@@ -54,23 +59,23 @@ export class MessageResponseParser {
    return (dec >>> 0).toString(2);
   }
 
-  public parse() {
-    console.log("Length of response: " + this.responseBuffer.length);
+  public parse() : Aircon {
+    this.log.info("Length of response: " + this.responseBuffer.length);
 
     let aircon = new Aircon();
 
 
     // for (let i = 0; i < this.responseBuffer.length; i++)
     // {
-    //   console.log( (i) + ": " + this.responseBuffer[i]);
+    //   log.info( (i) + ": " + this.responseBuffer[i]);
     // }
 
     //Get unit id
-    console.log("AC id is: " + this.responseBuffer[this.AirconId]);
+    this.log.info("AC id is: " + this.responseBuffer[this.AirconId]);
 
     //Running status..
     aircon.status = this.responseBuffer[this.AirconStatus] >> 7 ? true : false;
-    console.log("AC Status is: " + aircon.status);
+    this.log.info("AC Status is: " + aircon.status);
 
     //Get unit name
     let unitName = "";
@@ -78,9 +83,11 @@ export class MessageResponseParser {
     {
         unitName += String.fromCharCode(this.responseBuffer[this.SystemNameStart + i]);
     }
-    console.log("Unit name is: ''" + unitName + "'");
+    this.log.info("Unit name is: ''" + unitName + "'");
 
-    this.parseZones();
+    aircon.zones = this.parseZones();
+
+    return aircon;
   }
 
   public parseZones() : Array<Zone> {
@@ -92,7 +99,7 @@ export class MessageResponseParser {
 
      for (let i = 0;i<16;i++) {
        zoneData[i] = this.responseBuffer[this.ZoneDataStart + i];
-       // console.log("Binary is: " + zoneData[i]);
+       // log.info("Binary is: " + zoneData[i]);
      }
      for (let i = 0;i<16;i++) {
        groupData[i] = this.responseBuffer[this.GroupDataStart + i];
@@ -115,7 +122,7 @@ export class MessageResponseParser {
 
      let zones = new Array<Zone>();
      let numberOfZones = this.responseBuffer[this.NumberOfZones];
-     console.log("Number of zones: " + numberOfZones);
+     this.log.info("Number of zones: " + numberOfZones);
 
      for (let i = 0; i < numberOfZones; i++) {
         let zone = new Zone(0);
@@ -128,17 +135,17 @@ export class MessageResponseParser {
 
         //Discard lowest order bit (240 == 11110000), by performing binary and and bit-shifting right 4 bits
         let startZone = (groupData[i] & 240) >> 4;
-        console.log("Start zone: " + startZone);
+        this.log.info("Start zone: " + startZone);
 
         //We only want highest bit, so dec->bin, highest-significant-bit binary and, shift 7
         zone.status = ((zoneData[startZone] + 256) & 128) >> 7 ? ZoneStatus.ZoneOn : ZoneStatus.ZoneOff;
 
         zone.name = zoneName;
-        console.log("Zone " + i + " name is '" + zoneName + "' and status is: " + zone.status);
+        this.log.info("Zone " + i + " name is '" + zoneName + "' and status is: " + zone.status);
 
         // zone.desiredTemperature = Convert.ToInt32(groupSetting[i].JavaStyleSubstring(3, 8), 2) + 1;
         zone.desiredTemperature = (groupSetting[i] & 31) + 1;
-        console.log("Desired temperature: " + zone.desiredTemperature);
+        this.log.info("Desired temperature: " + zone.desiredTemperature);
 
      }
 

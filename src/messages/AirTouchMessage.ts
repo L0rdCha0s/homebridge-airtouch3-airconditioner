@@ -1,10 +1,16 @@
+import {
+  Logging
+} from "homebridge";
+
 export class AirTouchMessage {
    buffer: Int8Array;
-   sumByte: Int8Array
+   sumByte: Int8Array;
+   log: Logging;
 
-   constructor() {
+   constructor(log: Logging) {
      this.buffer = new Int8Array(13);
      this.sumByte = new Int8Array(13);
+     this.log = log;
    }
 
   resetMessage() {
@@ -16,7 +22,7 @@ export class AirTouchMessage {
    }
 
    printHexCode() {
-       console.log(Array.apply([], Array.from(this.buffer)).join(","));
+       this.log.info(Array.apply([], Array.from(this.buffer)).join(","));
    }
 
    calcChecksum() : number {
