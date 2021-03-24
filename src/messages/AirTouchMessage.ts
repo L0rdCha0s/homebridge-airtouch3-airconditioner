@@ -88,7 +88,7 @@ export class AirTouchMessage {
 
       let mode = 0;
       this.log.info("Air Conditioner brand id at mode select: " + brandId + " and mode " + mode);
-      if (acId == 0 && acBrandId == 11)
+      if (acId == 0 && brandId == 11)
             {
                 switch (inMode)
                 {
@@ -110,7 +110,7 @@ export class AirTouchMessage {
                 }
             }
 
-            if (acId == 0 && acBrandId == 15)
+            if (acId == 0 && brandId == 15)
             {
                 switch (inMode)
                 {
