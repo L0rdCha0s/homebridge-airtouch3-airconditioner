@@ -1,17 +1,14 @@
 # homebridge-airtouch3-airconditioner
 
-This Homebridge plugin, paired with the excellent work of [ozczecho](https://github.com/ozczecho), connects a Polyaire Airtouch 3 air conditioner to Homekit via Homebridge.
+This Homebridge plugin builds on the excellent work of [ozczecho](https://github.com/ozczecho), and connects a Polyaire Airtouch 3 air conditioner to Homekit via Homebridge.
 
 Configuration is as follows:
-
-1. Setup vzduch-dotek as per instructions [here](https://github.com/ozczecho/vzduch-dotek)
-2. Configure your Homebridge config with:
 
 ```
     {
           "accessory": "homebridge-airtouch3-airconditioner",
           "name": "Air Conditioner",
-          "apiRoot": "http://<vzduch-dotek-api>:<port>",
+          "airtouchHost": "<ip of your airtouch 3 unit>",
           "zones": [
               {
                   "zoneId": 0,

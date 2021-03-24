@@ -45,7 +45,6 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   private socket: net.Socket = new net.Socket();
   private promiseSocket: PromiseSocket<net.Socket> = new PromiseSocket(this.socket);
   private readonly name: string;
-  private readonly apiRoot: string
   private zoneSwitches: Array<Zone>
   private switchOn = false;
   private coolingTemperature = 24;
@@ -61,7 +60,6 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   constructor(log: Logging, config: AccessoryConfig, api: API) {
     this.log = log;
     this.name = config.name;
-    this.apiRoot = config.apiRoot;
     this.zoneSwitches = new Array<Zone>();
     if (config.airConId) {
       this.log.debug("Selecting override airconditioner ID: " + config.airConId);
