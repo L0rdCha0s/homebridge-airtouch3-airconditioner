@@ -151,9 +151,26 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
       .on(CharacteristicEventTypes.SET, async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
         log.info("Zone '" + zone.name + "' state was set to: " + value);
 
-        const newVal = (value == true ? 1 : 0);
-        const response = await axios.post(this.apiRoot + "/api/aircons/" + this.airConId + "/zones/" + (objZone.zoneId) + "/switch/" + newVal);
-        callback(null, value);
+        if (this.aircon != undefined) {
+          currentState = this.aircon!.zones[zone.zoneId].status;
+          if (value) {
+            if (currentState) {
+              //No OP.
+              this.log.info("Zone " + zone.zoneId + " already on");
+            } else {
+              this.toggleZone(zone.zoneId);
+            }
+          } else {
+            if (!currentState) {
+              this.log.info("Zone " + zone.zoneId + " already off");
+            } else {
+              this.toggleZone(zone.zoneId);              
+            }
+          }
+        } else {
+          this.log.info("Waiting for state from airconditioner");
+        }
+        callback(undefined);
       });
 
       this.zoneSwitches.push(objZone);
@@ -445,6 +462,15 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     this.log.info("Sending AC toggle..");
     let bufferTest = new AirTouchMessage(this.log);
     bufferTest.toggleAcOnOff(this.airConId);
+    bufferTest.printHexCode();
+    const total = await this.promiseSocket.write(Buffer.from(bufferTest.buffer.buffer));
+    this.log.info("Bytes written: " + total);
+  }
+
+  async sendToggleZone(zoneId: number) {
+    this.log.info("Sending Zone toggle..");
+    let bufferTest = new AirTouchMessage(this.log);
+    bufferTest.toggleZone(number);
     bufferTest.printHexCode();
     const total = await this.promiseSocket.write(Buffer.from(bufferTest.buffer.buffer));
     this.log.info("Bytes written: " + total);
