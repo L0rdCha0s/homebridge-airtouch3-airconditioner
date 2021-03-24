@@ -158,13 +158,13 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
               //No OP.
               this.log.info("Zone " + zone.zoneId + " already on");
             } else {
-              this.toggleZone(zone.zoneId);
+              this.sendToggleZone(zone.zoneId);
             }
           } else {
             if (!currentState) {
               this.log.info("Zone " + zone.zoneId + " already off");
             } else {
-              this.toggleZone(zone.zoneId);
+              this.sendToggleZone(zone.zoneId);
             }
           }
         } else {
