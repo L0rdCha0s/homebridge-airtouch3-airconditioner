@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "ES2018",
     "module": "commonjs",
+    "noImplicitAny": false
     "lib": [
       "ES2015",
       "ES2016",

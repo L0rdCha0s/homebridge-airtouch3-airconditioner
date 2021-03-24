@@ -40,7 +40,7 @@ class Zone {
 class Airtouch3Airconditioner implements AccessoryPlugin {
 
   private readonly log: Logging;
-  private socket: Socket;
+  private socket: net.Socket;
   private readonly name: string;
   private readonly apiRoot: string
   private zoneSwitches: Array<Zone>
@@ -365,7 +365,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
 
     console.log("Connected to airtouch at " + this.airtouchHost + ":" + this.airtouchPort);
 
-    this.socket.on('data', function(data) {
+    this.socket.on('data', function(data: ) {
     	console.log('Received: ' + data.length);
 
       let messageResponseParser = new MessageResponseParser(new Int8Array(data.buffer));
@@ -374,7 +374,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
 
     this.socket.on('close', async function(e) {
       console.log("********************************** AirTouch3 disconnected, reconnecting..");
-      await promiseSocket.connect(port, ip);
+      await promiseSocket.connect(this.airtouchPort, this.airtouchHost);
     });
 
     //Timer to send init message
