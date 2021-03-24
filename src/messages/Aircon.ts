@@ -18,5 +18,10 @@ export class Aircon {
     this._status = v;
   }
 
-	  
+  constructor() {
+    this._zones = new Array<Zone>;
+    this._status = false;
+  }
+
+
 }

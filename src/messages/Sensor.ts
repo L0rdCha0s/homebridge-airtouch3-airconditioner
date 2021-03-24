@@ -7,5 +7,8 @@ export class Sensor {
     this._currentTemperature = v;
   }
 
-  
+  constructor() {
+    this._currentTemperature = 0;
+  }
+
 }

@@ -359,7 +359,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
 
   async connectToServer() : Promise<void> {
     this.socket = new net.Socket()
-    const promiseSocket = new PromiseSocket(socket)
+    const promiseSocket = new PromiseSocket(this.socket)
     // promiseSocket.setTimeout(1000);
     await promiseSocket.connect(this.airtouchPort, this.airtouchHost)
 

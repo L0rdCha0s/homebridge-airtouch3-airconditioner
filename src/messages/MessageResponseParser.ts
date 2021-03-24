@@ -30,7 +30,7 @@ export class MessageResponseParser {
     this.responseBuffer = responseBuffer;
   }
 
-  private isPrint(aChar) : boolean {
+  private isPrint(aChar : string) : boolean {
       let myCharCode = aChar.charCodeAt(0);
 
       if((myCharCode > 31) && (myCharCode <  127))
