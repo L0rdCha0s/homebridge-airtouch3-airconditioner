@@ -41,7 +41,7 @@ class Zone {
 class Airtouch3Airconditioner implements AccessoryPlugin {
 
   private readonly log: Logging;
-  private antiFlap: boolean;
+  private antiFlap: boolean = false;
   private socket: net.Socket = new net.Socket();
   private promiseSocket: PromiseSocket<net.Socket> = new PromiseSocket(this.socket);
   private readonly name: string;
