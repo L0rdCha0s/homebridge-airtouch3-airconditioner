@@ -438,6 +438,15 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     this.log.info("Bytes written: " + total);
   }
 
+  async setMode(mode: number) {
+    this.log.info("Sending AC mode to " + mode);
+    let bufferTest = new AirTouchMessage(this.log);
+    bufferTest.setMode(this.airConId, this.brandId, mode);
+    bufferTest.printHexCode();
+    const total = await this.promiseSocket.write(Buffer.from(bufferTest.buffer.buffer));
+    this.log.info("Bytes written: " + total);
+  }
+
    stackTrace() {
     var err = new Error();
     return err.stack;

@@ -104,6 +104,8 @@ export class MessageResponseParser {
       default: aircon.mode = AcMode.AUTO; break;
     }
 
+    aircon.brandId = this.responseBuffer[this.AirconBrandId];
+
     aircon.zones = this.parseZones();
 
     return aircon;

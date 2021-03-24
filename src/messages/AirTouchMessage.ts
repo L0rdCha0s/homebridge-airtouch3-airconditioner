@@ -82,4 +82,59 @@ export class AirTouchMessage {
 
         return this.buffer;
     }
+
+    setMode(acId: number, brandId: number, inMode: number) {
+      this.resetMessage();
+
+      let mode = 0;
+      this.log.info("Air Conditioner brand id at mode select: " + brandId + " and mode " + mode);
+      if (acId == 0 && acBrandId == 11)
+            {
+                switch (inMode)
+                {
+                    case 0:
+                        mode = 0;
+                        break;
+                    case 1:
+                        mode = 2;
+                        break;
+                    case 2:
+                        mode = 3;
+                        break;
+                    case 3:
+                        mode = 4;
+                        break;
+                    case 4:
+                        mode = 1;
+                        break;
+                }
+            }
+
+            if (acId == 0 && acBrandId == 15)
+            {
+                switch (inMode)
+                {
+                    case 0:
+                        mode = 5;
+                        break;
+                    case 1:
+                        mode = 2;
+                        break;
+                    case 2:
+                        mode = 3;
+                        break;
+                    case 3:
+                        mode = 4;
+                        break;
+                    case 4:
+                        mode = 1;
+                        break;
+                }
+            }
+            this.buffer[1] = -122;
+            this.buffer[3] = acId;
+            this.buffer[4] = -127;
+            this.buffer[5] = mode;
+            this.buffer[12] = this.calcChecksum();
+    }
 }

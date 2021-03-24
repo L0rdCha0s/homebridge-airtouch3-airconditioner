@@ -24,6 +24,7 @@ export class Aircon {
     this._status = false;
     this._roomTemperature = 0;
     this._desiredTemperature = 0;
+    this._brandId = 0;
     this._mode = AcMode.AUTO;
   }
 
@@ -51,4 +52,11 @@ export class Aircon {
     this._mode = v;
   }
 
+  private _brandId : number;
+  public get brandId() : number {
+    return this._brandId;
+  }
+  public set brandId(v : number) {
+    this._brandId = v;
+  }
 }
