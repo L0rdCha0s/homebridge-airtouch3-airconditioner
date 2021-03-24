@@ -307,7 +307,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     //First get current zone temps
     let zoneCount = apiRes.aircons[this.airConId].zones.length;
 
-    var temps = new Array<number>;
+    var temps = new Array<number>();
     for (let i = 0; i < zoneCount; i++ ) {
       temps[i] = apiRes.aircons[this.airConId].zones[i].desiredTemperature;
     }
