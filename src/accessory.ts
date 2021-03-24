@@ -42,7 +42,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
 
   private readonly log: Logging;
   private socket: net.Socket = new net.Socket();
-  private promiseSocket: PromiseSocket = new PromiseSocket(this.socket);
+  private promiseSocket: PromiseSocket<net.Socket> = new PromiseSocket(this.socket);
   private readonly name: string;
   private readonly apiRoot: string
   private zoneSwitches: Array<Zone>
@@ -52,7 +52,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   private airConId = 0;
   private airtouchHost : string;
   private airtouchPort : number;
-  private aircon: Aircon;
+  private aircon: Aircon | undefined;
 
   private readonly service: Service;
   private readonly informationService: Service;
@@ -171,18 +171,19 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   handleActiveGet(callback: Function) : void {
     this.log.debug('Triggered GET Active');
 
-    const url = this.apiRoot + "/api/aircons";
-    this.log.debug("Getting values from: "  + url);
-
-    axios.get(url)
-    .then((response: AxiosResponse) => {
-      const activeState = response.data.aircons[this.airConId].powerStatus;
-      if (activeState == "1") {
-        callback(undefined, hap.Characteristic.Active.ACTIVE);
-      } else {
-        callback(undefined, hap.Characteristic.Active.INACTIVE);
-      }
-    });
+    if (this.aircon != undefined) {
+      axios.get(url)
+      .then((response: AxiosResponse) => {
+        const activeState = response.data.aircons[this.airConId].powerStatus;
+        if (this.aircon. status) {
+          callback(undefined, hap.Characteristic.Active.ACTIVE);
+        } else {
+          callback(undefined, hap.Characteristic.Active.INACTIVE);
+        }
+      });
+    } else {
+      callback(undefined, hap.Characteristic.Active.INACTIVE);
+    }
   }
 
   /**
@@ -191,12 +192,19 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   async handleActiveSet(callback: Function, value: string) : Promise<void> {
     this.log.debug('Triggered SET Active:' + value);
     if (value == "1") {
-      this.log.debug("Enabled air conditioner");
-      await axios.post(this.apiRoot + "/api/aircons/" + this.airConId + "/switch/1")
+        if (!this.aircon.status) {
+          await this.sendToggleAC();
+          this.log.debug("Air Conditioner turn on");
+        } else {
+          this.log.debug("Air Conditioner already on!");
+        }
     } else {
-      const url = this.apiRoot + "/api/aircons/" + this.airConId + "/switch/0";
-      this.log.debug("Disabled air conditioner, URL is " + url);
-      await axios.post(url)
+      if (this.aircon.status) {
+        await this.sendToggleAC();
+        this.log.debug("Air Conditioner turn off");
+      } else {
+        this.log.debug("Air Conditioner already off!");
+      }
     }
     callback(undefined);
   }
@@ -365,12 +373,12 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   async connectToServer() : Promise<void> {
 
     // promiseSocket.setTimeout(1000);
-    await promiseSocket.connect(this.airtouchPort, this.airtouchHost)
+    await this.promiseSocket.connect(this.airtouchPort, this.airtouchHost)
 
     this.log.info("Connected to airtouch at " + this.airtouchHost + ":" + this.airtouchPort);
 
     this.socket.on('data', (data) => {
-    	this.log.info('Received: ' + data.length);
+    this.log.info('Received: ' + data.length);
 
       let messageResponseParser = new MessageResponseParser(new Int8Array(data.buffer), this.log);
       this.aircon = messageResponseParser.parse();
@@ -378,7 +386,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
 
     this.socket.on('close', async (e) => {
       this.log.info("********************************** AirTouch3 disconnected, reconnecting..");
-      await promiseSocket.connect(this.airtouchPort, this.airtouchHost);
+      await this.promiseSocket.connect(this.airtouchPort, this.airtouchHost);
     });
 
     //Timer to send init message
@@ -403,7 +411,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   async sendToggleAC() {
     this.log.info("Sending AC toggle..");
     let bufferTest = new AirTouchMessage(this.log);
-    bufferTest.toggleAcOnOff();
+    bufferTest.toggleAcOnOff(this.airConId);
     bufferTest.printHexCode();
     const total = await this.promiseSocket.write(Buffer.from(bufferTest.buffer.buffer));
     this.log.info("Bytes written: " + total);
