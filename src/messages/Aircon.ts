@@ -19,7 +19,7 @@ export class Aircon {
   }
 
   constructor() {
-    this._zones = new Array<Zone>;
+    this._zones = new Array<Zone>();
     this._status = false;
   }
 
