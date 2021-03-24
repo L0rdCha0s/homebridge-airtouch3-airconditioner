@@ -378,11 +378,11 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
 
     //Timer to send init message
     setInterval(async () => {
-        await sendInit(promiseSocket);
+        await this.sendInit(promiseSocket);
     }, 60000);
 
     //Send an initial handshake
-    await sendInit(promiseSocket);
+    await this.sendInit(promiseSocket);
 
   }
 
