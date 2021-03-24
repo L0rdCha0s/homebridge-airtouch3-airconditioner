@@ -171,16 +171,12 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   handleActiveGet(callback: Function) : void {
     this.log.debug('Triggered GET Active');
 
-    if (this.aircon != undefined) {
-      axios.get(url)
-      .then((response: AxiosResponse) => {
-        const activeState = response.data.aircons[this.airConId].powerStatus;
-        if (this.aircon. status) {
-          callback(undefined, hap.Characteristic.Active.ACTIVE);
-        } else {
-          callback(undefined, hap.Characteristic.Active.INACTIVE);
-        }
-      });
+    if (this!.aircon != undefined) {
+      if (this.aircon!.status) {
+        callback(undefined, hap.Characteristic.Active.ACTIVE);
+      } else {
+        callback(undefined, hap.Characteristic.Active.INACTIVE);
+      }
     } else {
       callback(undefined, hap.Characteristic.Active.INACTIVE);
     }
@@ -192,14 +188,14 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   async handleActiveSet(callback: Function, value: string) : Promise<void> {
     this.log.debug('Triggered SET Active:' + value);
     if (value == "1") {
-        if (!this.aircon.status) {
+        if (!this.aircon!.status) {
           await this.sendToggleAC();
           this.log.debug("Air Conditioner turn on");
         } else {
           this.log.debug("Air Conditioner already on!");
         }
     } else {
-      if (this.aircon.status) {
+      if (this.aircon!.status) {
         await this.sendToggleAC();
         this.log.debug("Air Conditioner turn off");
       } else {
