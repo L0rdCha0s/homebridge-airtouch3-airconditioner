@@ -42,6 +42,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
 
   private readonly log: Logging;
   private socket: net.Socket = new net.Socket();
+  private promiseSocket: PromiseSocket = new PromiseSocket(this.socket);
   private readonly name: string;
   private readonly apiRoot: string
   private zoneSwitches: Array<Zone>
@@ -51,7 +52,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   private airConId = 0;
   private airtouchHost : string;
   private airtouchPort : number;
-
+  private aircon: Aircon;
 
   private readonly service: Service;
   private readonly informationService: Service;
@@ -362,7 +363,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   }
 
   async connectToServer() : Promise<void> {
-    const promiseSocket = new PromiseSocket(this.socket)
+
     // promiseSocket.setTimeout(1000);
     await promiseSocket.connect(this.airtouchPort, this.airtouchHost)
 
@@ -372,7 +373,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     	this.log.info('Received: ' + data.length);
 
       let messageResponseParser = new MessageResponseParser(new Int8Array(data.buffer), this.log);
-      messageResponseParser.parse();
+      this.aircon = messageResponseParser.parse();
     });
 
     this.socket.on('close', async (e) => {
@@ -382,21 +383,30 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
 
     //Timer to send init message
     setInterval(async () => {
-        await this.sendInit(promiseSocket);
+        await this.sendInit();
     }, 60000);
 
     //Send an initial handshake
-    await this.sendInit(promiseSocket);
+    await this.sendInit();
 
   }
 
-  async sendInit(promiseSocket : PromiseSocket<net.Socket>) {
+  async sendInit() {
     this.log.info("Sending init..");
     let bufferTest = new AirTouchMessage(this.log);
     bufferTest.getInitMsg();
     bufferTest.printHexCode();
-    const total = await promiseSocket.write(Buffer.from(bufferTest.buffer.buffer));
+    const total = await this.promiseSocket.write(Buffer.from(bufferTest.buffer.buffer));
     this.log.info("Bytes written: " + total);
-}
+  }
+
+  async sendToggleAC() {
+    this.log.info("Sending AC toggle..");
+    let bufferTest = new AirTouchMessage(this.log);
+    bufferTest.toggleAcOnOff();
+    bufferTest.printHexCode();
+    const total = await this.promiseSocket.write(Buffer.from(bufferTest.buffer.buffer));
+    this.log.info("Bytes written: " + total);
+  }
 
 }
