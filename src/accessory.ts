@@ -152,7 +152,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
         log.info("Zone '" + zone.name + "' state was set to: " + value);
 
         if (this.aircon != undefined) {
-          currentState = this.aircon!.zones[zone.zoneId].status;
+          let currentState = this.aircon!.zones[zone.zoneId].status;
           if (value) {
             if (currentState) {
               //No OP.
@@ -164,7 +164,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
             if (!currentState) {
               this.log.info("Zone " + zone.zoneId + " already off");
             } else {
-              this.toggleZone(zone.zoneId);              
+              this.toggleZone(zone.zoneId);
             }
           }
         } else {
@@ -470,7 +470,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   async sendToggleZone(zoneId: number) {
     this.log.info("Sending Zone toggle..");
     let bufferTest = new AirTouchMessage(this.log);
-    bufferTest.toggleZone(number);
+    bufferTest.toggleZone(zoneId);
     bufferTest.printHexCode();
     const total = await this.promiseSocket.write(Buffer.from(bufferTest.buffer.buffer));
     this.log.info("Bytes written: " + total);
