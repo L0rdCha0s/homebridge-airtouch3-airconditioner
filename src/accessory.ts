@@ -18,6 +18,7 @@ import PromiseWritable from "promise-writable"
 import { AirTouchMessage } from "./messages/AirTouchMessage";
 import { MessageResponseParser } from "./messages/MessageResponseParser"
 import { Aircon } from "./messages/Aircon"
+import { AcMode } from "./enums/AcMode"
 
 let hap: HAP;
 
@@ -243,8 +244,16 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   handleTargetHeaterCoolerStateGet(callback: Function) : void {
     this.log.debug('Triggered GET TargetHeaterCoolerState');
 
-    // set this to a valid value for TargetHeaterCoolerState
-    const currentValue = hap.Characteristic.TargetHeaterCoolerState.COOL;
+    if (this.aircon != undefined) {
+      let mode = this.aircon.mode;
+      if (mode == AcMode.COOL) {
+        mode = 2; //Airtouch modes overlap 1-1, except for cool -which is '2' not '4'
+      }
+      callback(undefined, mode);
+    } else {
+      this.log.debug("No aircon state currently, returning 0");
+      callback(undefined, hap.characteristic.TargetHeaterCoolerState.AUTO);
+    }
 
     callback(undefined, currentValue);
   }

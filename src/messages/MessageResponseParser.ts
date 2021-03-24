@@ -2,6 +2,8 @@ import { MessageConstants } from "./MessageConstants"
 import { ZoneStatus } from "./enums/ZoneStatus"
 import { Zone } from "./Zone"
 import { Aircon } from "./Aircon"
+import { AcMode } from "./enums/AcMode"
+
 import {
   Logging
 } from "homebridge";
@@ -90,6 +92,17 @@ export class MessageResponseParser {
 
     //All except most significant bit
     aircon.desiredTemperature = this.responseBuffer[this.DesiredTemperature] & 127;
+
+    //Get mode - all except most significant bit
+    let mode = this.responseBuffer[this.AirconMode] & 127;
+    switch (mode) {
+      case 0: aircon.mode = AcMode.AUTO; break;
+      case 1: aircon.mode = AcMode.HEAT; break;
+      case 4: aircon.mode = AcMode.COOL; break;
+
+      //Homekit doesn't handle 'DRY' or 'FAN' - pretend we're in 'AUTO'
+      default: aircon.mode = AcMode.AUTO; break;
+    }
 
     aircon.zones = this.parseZones();
 

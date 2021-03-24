@@ -1,5 +1,6 @@
 import { Zone } from "./Zone"
 import { Sensor } from "./Sensor"
+import { AcMode } from "./enums/AcMode"
 
 export class Aircon {
   private _zones : Array<Zone>;
@@ -23,6 +24,7 @@ export class Aircon {
     this._status = false;
     this._roomTemperature = 0;
     this._desiredTemperature = 0;
+    this._mode = AcMode.AUTO;
   }
 
   private _roomTemperature : number;
@@ -41,5 +43,12 @@ export class Aircon {
     this._desiredTemperature = v;
   }
 
+  private _mode : AcMode;
+  public get mode() : AcMode {
+    return this._mode;
+  }
+  public set mode(v : AcMode) {
+    this._mode = v;
+  }
 
 }
