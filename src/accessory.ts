@@ -267,10 +267,10 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   /**
   * Handle requests to set the "Target Heater-Cooler State" characteristic
   */
-  async handleTargetHeaterCoolerStateSet(callback: Function, value: string) : void {
+   handleTargetHeaterCoolerStateSet(callback: Function, value: string) : void {
     this.log.debug('Triggered SET TargetHeaterCoolerState:' + value);
 
-    await this.setMode(value);
+    this.setMode(Number(value));
     callback(undefined);
   }
 
