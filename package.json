@@ -36,6 +36,7 @@
     "homebridge": "^1.0.4"
   },
   "dependencies": {
-    "axios": "^0.21.1"
+    "axios": "^0.21.1",
+    "promise-socket": "^7.0.0"
   }
 }

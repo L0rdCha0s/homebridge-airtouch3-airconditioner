@@ -12,6 +12,11 @@ import {
 } from "homebridge";
 
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosPromise } from 'axios';
+import net from "net"
+import PromiseSocket from "promise-socket"
+import PromiseWritable from "promise-writable"
+import { AirTouchMessage } from "./messages/AirTouchMessage";
+import { MessageResponseParser } from "./messages/MessageResponseParser"
 
 let hap: HAP;
 
@@ -40,8 +45,11 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   private zoneSwitches: Array<Zone>
   private switchOn = false;
   private coolingTemperature = 24;
-  private heatingTemperature = 15;
+  private heatingTemperature = 15; 
   private airConId = 0;
+  private airtouchHost : string;
+  private airtouchPort : number;
+
 
   private readonly service: Service;
   private readonly informationService: Service;
@@ -55,6 +63,9 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
       this.log.debug("Selecting override airconditioner ID: " + config.airConId);
       this.airConId = config.airConId;
     }
+    this.airtouchHost = config.airtouchHost;
+    this.airtouchPort = config.airtouchPort;	    
+
 
 
     // create a new Heater Cooler service

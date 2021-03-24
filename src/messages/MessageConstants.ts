@@ -1,0 +1,21 @@
+export module MessageConstants {
+  const GroupNameStart = 104;
+  const ZoneDataStart = 232;
+  const GroupPercentageDataStart = 248;
+  const GroupDataStart = 264;
+  const GroupSettingStart = 296;
+  const NumberOfZones = 352;
+  const SystemNameStart = 383;
+  const AirconStatus = 423;
+  const AirconBrandId = 425;
+  const AirconMode = 427;
+  const FanSpeed = 429;
+  const DesiredTemperature = 431;
+  const RoomTemperature = 433;
+  const AirconId = 439;
+  const ThermostatMode = 441;
+  const TouchpadGroupId = 443;
+  const TouchpadTemperature = 445;
+  const SensorDataStart = 451;
+  const AirTouchIdStart = 483;
+}
