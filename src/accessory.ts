@@ -366,17 +366,17 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     // promiseSocket.setTimeout(1000);
     await promiseSocket.connect(this.airtouchPort, this.airtouchHost)
 
-    log.info("Connected to airtouch at " + this.airtouchHost + ":" + this.airtouchPort);
+    this.log.info("Connected to airtouch at " + this.airtouchHost + ":" + this.airtouchPort);
 
     this.socket.on('data', (data) => {
-    	log.info('Received: ' + data.length);
+    	this.log.info('Received: ' + data.length);
 
       let messageResponseParser = new MessageResponseParser(new Int8Array(data.buffer), this.log);
       messageResponseParser.parse();
     });
 
     this.socket.on('close', async (e) => {
-      log.info("********************************** AirTouch3 disconnected, reconnecting..");
+      this.log.info("********************************** AirTouch3 disconnected, reconnecting..");
       await promiseSocket.connect(this.airtouchPort, this.airtouchHost);
     });
 
@@ -391,12 +391,12 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   }
 
   async sendInit(promiseSocket : PromiseSocket<net.Socket>) {
-    log.info("Sending init..");
+    this.log.info("Sending init..");
     let bufferTest = new AirTouchMessage(this.log);
     bufferTest.getInitMsg();
     bufferTest.printHexCode();
     const total = await promiseSocket.write(Buffer.from(bufferTest.buffer.buffer));
-    log.info("Bytes written: " + total);
+    this.log.info("Bytes written: " + total);
 }
 
 }
