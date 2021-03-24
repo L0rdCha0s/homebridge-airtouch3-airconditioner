@@ -21,6 +21,15 @@ export class Aircon {
   constructor() {
     this._zones = new Array<Zone>();
     this._status = false;
+    this._roomTemperature = 0;
+  }
+
+  private _roomTemperature : number;
+  public get roomTemperature() : number {
+    return this._roomTemperature;
+  }
+  public set roomTemperature(v : number) {
+    this._roomTemperature = v;
   }
 
 

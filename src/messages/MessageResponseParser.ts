@@ -85,6 +85,9 @@ export class MessageResponseParser {
     }
     this.log.info("Unit name is: ''" + unitName + "'");
 
+    aircon.roomTemperature = this.responseBuffer[this.RoomTemperature];
+    this.log.info("Room temperature is: " + aircon.roomTemperature);
+
     aircon.zones = this.parseZones();
 
     return aircon;
