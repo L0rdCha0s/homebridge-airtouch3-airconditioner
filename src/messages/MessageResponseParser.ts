@@ -147,6 +147,8 @@ export class MessageResponseParser {
         zone.desiredTemperature = (groupSetting[i] & 31) + 1;
         this.log.info("Desired temperature: " + zone.desiredTemperature);
 
+        zones.push(zone);
+
      }
 
      return zones;
