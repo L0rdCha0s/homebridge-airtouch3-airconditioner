@@ -1,5 +1,5 @@
 {
-  "pluginAlias": "Airtouch3 Air Conditioner",
+  "pluginAlias": "homebridge-airtouch3-airconditioner",
   "pluginType": "accessory",
   "headerDisplay": "A plugin to control AirTouch3 air conditioner units.",
   "footerDisplay": "For help please see the [GitHub](https://github.com/L0rdCha0s/homebridge-airtouch3-airconditioner).",
