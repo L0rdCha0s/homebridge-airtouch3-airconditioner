@@ -68,7 +68,6 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     this.airtouchPort = config.airtouchPort;
 
 
-
     // create a new Heater Cooler service
     this.service = new hap.Service.HeaterCooler(this.name);
 
@@ -157,6 +156,10 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     .setCharacteristic(hap.Characteristic.Model, "v3");
 
     log.info("Switch finished initializing!");
+
+
+    //Now, connect to airtouch..
+    this.connectToServer();
   }
 
 
