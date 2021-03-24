@@ -269,6 +269,8 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   */
   handleTargetHeaterCoolerStateSet(callback: Function, value: string) : void {
     this.log.debug('Triggered SET TargetHeaterCoolerState:' + value);
+
+    await this.setMode(value);
     callback(undefined);
   }
 
@@ -310,14 +312,24 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
 
   handleCoolingTemperatureSet(callback: Function, value: string) : void {
     this.log.debug('Triggered SET TargetCoolingTemperatureSET:' + value);
-    this.coolingTemperature = Number(value);
-    this.setTargetTemperature(this.coolingTemperature, callback);
+
+    if (this.aircon != undefined) {
+      callback(undefined, this.aircon.desiredTemperature);
+    } else {
+      this.log.debug("No aircon state currently, returning 0");
+      callback(undefined, 0);
+    }
   }
 
   handleHeatingTemperatureSet(callback: Function, value: string) : void {
     this.log.debug('Triggered SET HeatingTemperature:' + value);
-    this.heatingTemperature = Number(value);
-    this.setTargetTemperature(this.heatingTemperature, callback);
+
+    if (this.aircon != undefined) {
+      callback(undefined, this.aircon.desiredTemperature);
+    } else {
+      this.log.debug("No aircon state currently, returning 0");
+      callback(undefined, 0);
+    }
   }
 
 
