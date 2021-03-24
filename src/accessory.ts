@@ -203,6 +203,8 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
       }
     }
     callback(undefined);
+
+    this.log.info(this.stackTrace());
   }
 
   /**
@@ -413,4 +415,8 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     this.log.info("Bytes written: " + total);
   }
 
+   stackTrace() {
+    var err = new Error();
+    return err.stack;
+   }
 }
