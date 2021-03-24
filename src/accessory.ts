@@ -52,7 +52,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   private heatingTemperature = 15;
   private airConId = 0;
   private airtouchHost : string;
-  private airtouchPort : number;
+  private airtouchPort : number = 8899;
   private aircon: Aircon | undefined;
 
   private readonly service: Service;
@@ -68,7 +68,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
       this.airConId = config.airConId;
     }
     this.airtouchHost = config.airtouchHost;
-    this.airtouchPort = config.airtouchPort;
+    if (config.airtouchPort) this.airtouchPort = config.airtouchPort;
 
 
     // create a new Heater Cooler service
@@ -330,7 +330,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     this.log.debug('Triggered SET TargetCoolingTemperatureSET:' + value);
 
     if (this.aircon != undefined) {
-      this.setTargetTemperature(value, callback);
+      this.setTargetTemperature(Number(value), callback);
     } else {
       this.log.debug("No aircon state currently, returning 0");
       callback(undefined, 0);
@@ -341,7 +341,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     this.log.debug('Triggered SET HeatingTemperature:' + value);
 
     if (this.aircon != undefined) {
-      this.setTargetTemperature(value, callback);
+      this.setTargetTemperature(Number(value), callback);
     } else {
       this.log.debug("No aircon state currently, returning 0");
       callback(undefined, 0);
@@ -375,7 +375,6 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
         for (var i = 0; i < diff; i++) {
           await new Promise(resolve => setTimeout(resolve, 1000));
           await this.sendZoneTemp(j,incDec);
-          this.log.debug("Calling zone temp: " + callStr);
         }
         this.log.debug("-- End Zone --");
       }

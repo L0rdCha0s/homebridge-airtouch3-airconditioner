@@ -86,9 +86,9 @@ export class AirTouchMessage {
         this.buffer[4] = 1;
     }
     this.buffer[5] = 1;
-    this.buffer[12] = this.calcChecksum;
+    this.buffer[12] = this.calcChecksum();
 
-    return _message;
+    return this.buffer;
 }
 
    toggleAcOnOff(acId: number)
