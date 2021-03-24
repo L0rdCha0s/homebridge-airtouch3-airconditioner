@@ -40,7 +40,7 @@ class Zone {
 class Airtouch3Airconditioner implements AccessoryPlugin {
 
   private readonly log: Logging;
-  private socket: net.Socket;
+  private socket: net.Socket = null;
   private readonly name: string;
   private readonly apiRoot: string
   private zoneSwitches: Array<Zone>
@@ -386,5 +386,14 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     await sendInit(promiseSocket);
 
   }
+
+  async sendInit(promiseSocket : PromiseSocket<net.Socket>) {
+    console.log("Sending init..");
+    let bufferTest = new AirTouchMessage();
+    bufferTest.getInitMsg();
+    bufferTest.printHexCode();
+    const total = await promiseSocket.write(Buffer.from(bufferTest.buffer.buffer));
+    console.log("Bytes written: " + total);
+}
 
 }
