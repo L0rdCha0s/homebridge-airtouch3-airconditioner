@@ -1,0 +1,47 @@
+{
+  "pluginAlias": "Airtouch3 Air Conditioner",
+  "pluginType": "accessory",
+  "headerDisplay": "A plugin to control AirTouch3 air conditioner units.",
+  "footerDisplay": "For help please see the [GitHub](https://github.com/L0rdCha0s/homebridge-airtouch3-airconditioner).",
+  "schema": {
+    "name": {
+      "title": "Name",
+      "type": "string",
+      "default": "Air Conditioner",
+      "required": true
+    },
+    "airtouchHost": {
+      "title": "Airtouch 3 Hostname or IP",
+      "type": "string",
+      "default": "",
+      "required": true
+    },
+    "airtouchPort": {
+      "title": "Airtouch 3 Port (Usually 8899)",
+      "type": "integer",
+      "default": 8899,
+      "required": true
+    },
+    "zones": {
+      "type": "array",
+      "items": {
+        "title": "Zone Details",
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Zone Name",
+            "type": "string",
+            "default": "",
+            "required": true
+          },
+          "zoneId": {
+            "title": "Zone ID",
+            "type": "integer",
+            "default": 0,
+            "required": true
+          }
+        }
+      }
+    }
+  }
+}
