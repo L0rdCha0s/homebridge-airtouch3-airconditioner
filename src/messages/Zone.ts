@@ -42,8 +42,9 @@ export class Zone {
    }
 
    constructor(touchPadTemperature : number) {
-       this.touchPadTemperature = touchPadTemperature;
+       this._touchPadTemperature = touchPadTemperature;
        this._desiredTemperature = 0;
+       this._name = "";
        this._status = ZoneStatus.ZoneOff;
        this._id = 0;
    }
