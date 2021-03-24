@@ -87,6 +87,13 @@ export class AirTouchMessage {
       this.resetMessage();
 
       let mode = inMode;
+
+      //Translate apple homekit to airtouch:   In Homekit, Cool==2, in Airtouch, Cool == 4;
+      //Also 'Fan' and 'Dry' don't exist in Homekit
+      if (mode == 2) {
+        mode = 4;
+      }
+
       this.log.info("Air Conditioner brand id at mode select: " + brandId + " and mode " + mode);
       if (acId == 0 && brandId == 11)
             {
