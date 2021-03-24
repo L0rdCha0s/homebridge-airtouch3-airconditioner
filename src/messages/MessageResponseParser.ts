@@ -105,6 +105,7 @@ export class MessageResponseParser {
     }
 
     aircon.brandId = this.responseBuffer[this.AirconBrandId];
+    this.log.debug("Air conditioner brand id is: " + aircon.brandId);
 
     aircon.zones = this.parseZones();
 

@@ -86,7 +86,7 @@ export class AirTouchMessage {
     setMode(acId: number, brandId: number, inMode: number) {
       this.resetMessage();
 
-      let mode = 0;
+      let mode = inMode;
       this.log.info("Air Conditioner brand id at mode select: " + brandId + " and mode " + mode);
       if (acId == 0 && brandId == 11)
             {
