@@ -128,7 +128,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
       objZone.zoneSwitch.getCharacteristic(hap.Characteristic.On)
       .on(CharacteristicEventTypes.GET, async (callback: CharacteristicGetCallback) => {
 
-        if (aircons != undefined) {
+        if (this.aircon != undefined) {
 
           let zoneObj = this.aircon!.zones[zone.zoneId];
           if (zoneObj != undefined) {
