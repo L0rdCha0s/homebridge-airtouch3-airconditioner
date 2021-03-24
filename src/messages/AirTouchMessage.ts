@@ -72,6 +72,25 @@ export class AirTouchMessage {
     return this.buffer;
    }
 
+   setFan(room: number, incDec: number) {
+    this.resetMessage();
+    this.buffer[1] = 1;
+    this.buffer[1] = -127;
+    this.buffer[3] = room;
+    if (incDec >= 0)
+    {
+        this.buffer[4] = 2;
+    }
+    else
+    {
+        this.buffer[4] = 1;
+    }
+    this.buffer[5] = 1;
+    this.buffer[12] = this.calcChecksum;
+
+    return _message;
+}
+
    toggleAcOnOff(acId: number)
    {
         this.resetMessage();

@@ -11,7 +11,6 @@ import {
   Service,
 } from "homebridge";
 
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosPromise } from 'axios';
 import net from "net"
 import PromiseSocket from "promise-socket"
 import PromiseWritable from "promise-writable"
@@ -331,7 +330,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     this.log.debug('Triggered SET TargetCoolingTemperatureSET:' + value);
 
     if (this.aircon != undefined) {
-      callback(undefined, this.aircon.desiredTemperature);
+      this.setTargetTemperature(value, callback);
     } else {
       this.log.debug("No aircon state currently, returning 0");
       callback(undefined, 0);
@@ -342,7 +341,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     this.log.debug('Triggered SET HeatingTemperature:' + value);
 
     if (this.aircon != undefined) {
-      callback(undefined, this.aircon.desiredTemperature);
+      this.setTargetTemperature(value, callback);
     } else {
       this.log.debug("No aircon state currently, returning 0");
       callback(undefined, 0);
@@ -350,46 +349,38 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   }
 
 
-  /***************** Helper functions ***************/
-  async getAPIState() : Promise<any> {
-    const url = this.apiRoot + "/api/aircons";
-    const response = await axios.get(url);
-    return response.data;
-  }
-
   async setTargetTemperature(temperature: number, callback: Function) : Promise<number> {
     this.log.debug('Setting target temperature: ' + temperature);
-    const apiRes = await this.getAPIState();
-    const temp = apiRes.aircons[this.airConId].desiredTemperature;
-    this.log("Current target temp: " + temp);
-    this.log("New targetTemperature: " + temperature);
 
     //Callback before working on it, because it may take a while and hit homekit's response time limit
     callback(undefined);
 
     //First get current zone temps
-    let zoneCount = apiRes.aircons[this.airConId].zones.length;
+    if (this.aircon != undefined) {
+      let zoneCount = this.aircon!.zones.length;
 
-    var temps = new Array<number>();
-    for (let i = 0; i < zoneCount; i++ ) {
-      temps[i] = apiRes.aircons[this.airConId].zones[i].desiredTemperature;
-    }
-    this.log.debug("Zone temps: ");
-    temps.map(x => this.log.debug("Temp: " + x));
-
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    for (var j = 0; j < zoneCount; j++) {
-      let diff = Math.abs(temps[j] - temperature);
-      let incDec = -1;
-      if (temps[j] < temperature) incDec = 1;
-
-      for (var i = 0; i < diff; i++) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        const callStr = this.apiRoot + "/api/aircons/" + this.airConId + "/zones/" + j + "/temperature/" + incDec;
-        this.log.debug("Calling zone temp: " + callStr);
-        const resp2 = await axios.post(callStr);
+      var temps = new Array<number>();
+      for (let i = 0; i < zoneCount; i++ ) {
+        temps[i] = this.aircon!.zones[i].desiredTemperature;
       }
-      this.log.debug("-- End Zone --");
+      this.log.debug("Zone temps: ");
+      temps.map(x => this.log.debug("Temp: " + x));
+
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      for (var j = 0; j < zoneCount; j++) {
+        let diff = Math.abs(temps[j] - temperature);
+        let incDec = -1;
+        if (temps[j] < temperature) incDec = 1;
+
+        for (var i = 0; i < diff; i++) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          await this.sendZoneTemp(j,incDec);
+          this.log.debug("Calling zone temp: " + callStr);
+        }
+        this.log.debug("-- End Zone --");
+      }
+    } else {
+      this.log.info("Cannot set temperature before air conditioner responds with status");
     }
 
     return temperature;
@@ -471,6 +462,15 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     this.log.info("Sending Zone toggle..");
     let bufferTest = new AirTouchMessage(this.log);
     bufferTest.toggleZone(zoneId);
+    bufferTest.printHexCode();
+    const total = await this.promiseSocket.write(Buffer.from(bufferTest.buffer.buffer));
+    this.log.info("Bytes written: " + total);
+  }
+
+  async sendZoneTemp(zoneId: number, incDec: number) {
+    this.log.info("Sending temp change to zone..");
+    let bufferTest = new AirTouchMessage(this.log);
+    bufferTest.setFan(zoneId, incDec);
     bufferTest.printHexCode();
     const total = await this.promiseSocket.write(Buffer.from(bufferTest.buffer.buffer));
     this.log.info("Bytes written: " + total);
