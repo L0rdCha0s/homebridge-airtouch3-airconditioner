@@ -542,7 +542,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
 
   async setFanSpeed(speed: number) {
     //We interpret mode == 0 as auto, which to airtouch is 5.  Use that
-    if (speed = 0) speed = 5;
+    if (speed == 0) speed = 5;
 
     this.log.info("Sending AC fan speed to " + speed);
 
