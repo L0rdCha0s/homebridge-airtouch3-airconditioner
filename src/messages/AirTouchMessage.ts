@@ -196,6 +196,7 @@ export class AirTouchMessage {
                 }
             }
 
+      this.log.info("Final mode sending for fan speed: " + mode);
       this.buffer[1] = -122;
       this.buffer[3] = acId;
       this.buffer[4] = -126;
