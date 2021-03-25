@@ -38,6 +38,17 @@ class Zone {
   }
 }
 
+class Queue<T> {
+  _store: T[] = [];
+  push(val: T) {
+    this._store.push(val);
+  }
+  pop(): T | undefined {
+    return this._store.shift();
+  }
+}
+
+
 class Airtouch3Airconditioner implements AccessoryPlugin {
 
   private readonly log: Logging;
@@ -53,6 +64,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   private airtouchHost : string;
   private airtouchPort : number = 8899;
   private aircon: Aircon | undefined;
+  private commandQueue = new Queue<AirTouchMessage>();
 
   private readonly service: Service;
   private readonly informationService: Service;
@@ -196,6 +208,16 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     log.info("Switch finished initializing!");
 
 
+    //Start outbound command queue runner
+    setInterval(async () => {
+        let message = this.commandQueue.pop();
+        if (message != undefined) {
+          const total = await this.promiseSocket.write(Buffer.from(bufferTest.buffer.buffer));
+          this.log.info("Bytes written: " + total);
+        } else {
+          this.log.info("No outbound commands to run on airtouch");
+        }
+    }, 2000);
     //Now, connect to airtouch..
     this.connectToServer();
   }
@@ -379,14 +401,12 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
       this.log.debug("Zone temps: ");
       temps.map(x => this.log.debug("Temp: " + x));
 
-      await new Promise(resolve => setTimeout(resolve, 1000));
       for (var j = 0; j < zoneCount; j++) {
         let diff = Math.abs(temps[j] - temperature);
         let incDec = -1;
         if (temps[j] < temperature) incDec = 1;
 
         for (var i = 0; i < diff; i++) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
           await this.sendZoneTemp(j,incDec);
         }
         this.log.debug("-- End Zone --");
@@ -457,8 +477,8 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     let bufferTest = new AirTouchMessage(this.log);
     bufferTest.getInitMsg();
     bufferTest.printHexCode();
-    const total = await this.promiseSocket.write(Buffer.from(bufferTest.buffer.buffer));
-    this.log.info("Bytes written: " + total);
+
+    this.commandQueue.push(bufferTest);
   }
 
   async sendToggleAC() {
@@ -466,8 +486,8 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     let bufferTest = new AirTouchMessage(this.log);
     bufferTest.toggleAcOnOff(this.airConId);
     bufferTest.printHexCode();
-    const total = await this.promiseSocket.write(Buffer.from(bufferTest.buffer.buffer));
-    this.log.info("Bytes written: " + total);
+    this.commandQueue.push(bufferTest);
+
   }
 
   async sendToggleZone(zoneId: number) {
@@ -475,8 +495,8 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     let bufferTest = new AirTouchMessage(this.log);
     bufferTest.toggleZone(zoneId);
     bufferTest.printHexCode();
-    const total = await this.promiseSocket.write(Buffer.from(bufferTest.buffer.buffer));
-    this.log.info("Bytes written: " + total);
+    this.commandQueue.push(bufferTest);
+
   }
 
   async sendZoneTemp(zoneId: number, incDec: number) {
@@ -484,8 +504,8 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     let bufferTest = new AirTouchMessage(this.log);
     bufferTest.setFan(zoneId, incDec);
     bufferTest.printHexCode();
-    const total = await this.promiseSocket.write(Buffer.from(bufferTest.buffer.buffer));
-    this.log.info("Bytes written: " + total);
+    this.commandQueue.push(bufferTest);
+
   }
 
   async setMode(mode: number) {
@@ -493,8 +513,8 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     let bufferTest = new AirTouchMessage(this.log);
     bufferTest.setMode(this.airConId, this.aircon!.brandId, mode);
     bufferTest.printHexCode();
-    const total = await this.promiseSocket.write(Buffer.from(bufferTest.buffer.buffer));
-    this.log.info("Bytes written: " + total);
+    this.commandQueue.push(bufferTest);
+
   }
 
    stackTrace() {
