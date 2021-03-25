@@ -62,7 +62,7 @@ export class MessageResponseParser {
   }
 
   public parse() : Aircon {
-    this.log.info("Length of response: " + this.responseBuffer.length);
+    this.log.debug("Length of response: " + this.responseBuffer.length);
 
     let aircon = new Aircon();
 
@@ -73,7 +73,7 @@ export class MessageResponseParser {
     // }
 
     //Get unit id
-    this.log.info("AC id is: " + this.responseBuffer[this.AirconId]);
+    this.log.debug("AC id is: " + this.responseBuffer[this.AirconId]);
 
     //Running status..
     aircon.status = this.responseBuffer[this.AirconStatus] >> 7 ? true : false;
@@ -85,7 +85,7 @@ export class MessageResponseParser {
     {
         unitName += String.fromCharCode(this.responseBuffer[this.SystemNameStart + i]);
     }
-    this.log.info("Unit name is: ''" + unitName + "'");
+    this.log.debug("Unit name is: ''" + unitName + "'");
 
     aircon.roomTemperature = this.responseBuffer[this.RoomTemperature];
     this.log.info("Room temperature is: " + aircon.roomTemperature);
@@ -119,7 +119,7 @@ export class MessageResponseParser {
             break;
     }
 
-    this.log.info("Fan speed is set to " + aircon.fanSpeed);
+    this.log.debug("Fan speed is set to " + aircon.fanSpeed);
 
     aircon.zones = this.parseZones();
 
@@ -171,17 +171,17 @@ export class MessageResponseParser {
 
         //Discard lowest order bit (240 == 11110000), by performing binary and and bit-shifting right 4 bits
         let startZone = (groupData[i] & 240) >> 4;
-        this.log.info("Start zone: " + startZone);
+        this.log.debug("Start zone: " + startZone);
 
         //We only want highest bit, so dec->bin, highest-significant-bit binary and, shift 7
         zone.status = ((zoneData[startZone] + 256) & 128) >> 7 ? ZoneStatus.ZoneOn : ZoneStatus.ZoneOff;
 
         zone.name = zoneName;
-        this.log.info("Zone " + i + " name is '" + zoneName + "' and status is: " + zone.status);
+        this.log.debug("Zone " + i + " name is '" + zoneName + "' and status is: " + zone.status);
 
         // zone.desiredTemperature = Convert.ToInt32(groupSetting[i].JavaStyleSubstring(3, 8), 2) + 1;
         zone.desiredTemperature = (groupSetting[i] & 31) + 1;
-        this.log.info("Desired temperature: " + zone.desiredTemperature);
+        this.log.debug("Desired temperature: " + zone.desiredTemperature);
 
         zones.push(zone);
 

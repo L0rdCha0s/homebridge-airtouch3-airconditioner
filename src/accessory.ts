@@ -481,14 +481,14 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     this.log.info("Connected to airtouch at " + this.airtouchHost + ":" + this.airtouchPort);
 
     this.socket.on('data', (data) => {
-    this.log.info('Received: ' + data.length);
+    this.log.debug('Received: ' + data.length);
 
       let messageResponseParser = new MessageResponseParser(new Int8Array(data.buffer), this.log);
       this.aircon = messageResponseParser.parse();
     });
 
     this.socket.on('close', async (e) => {
-      this.log.info("********************************** AirTouch3 disconnected, reconnecting..");
+      this.log.debug("********** AirTouch3 disconnected, reconnecting..");
       await this.promiseSocket.connect(this.airtouchPort, this.airtouchHost);
     });
 
@@ -503,7 +503,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   }
 
   async sendInit() {
-    this.log.info("Sending init..");
+    this.log.debug("Sending init..");
     let bufferTest = new AirTouchMessage(this.log);
     bufferTest.getInitMsg();
     bufferTest.printHexCode();

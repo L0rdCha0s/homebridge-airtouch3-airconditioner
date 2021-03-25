@@ -30,7 +30,7 @@ export class AirTouchMessage {
    }
 
    printHexCode() {
-       this.log.info(Array.apply([], Array.from(this.buffer)).join(","));
+       this.log.debug(Array.apply([], Array.from(this.buffer)).join(","));
    }
 
    calcChecksum() : number {
@@ -121,7 +121,7 @@ export class AirTouchMessage {
         mode = 4;
       }
 
-      this.log.info("Air Conditioner brand id at mode select: " + brandId + " and mode " + mode);
+      this.log.debug("Air Conditioner brand id at mode select: " + brandId + " and mode " + mode);
       if (acId == 0 && brandId == 11)
             {
                 switch (inMode)
@@ -203,7 +203,7 @@ export class AirTouchMessage {
           }
       }
 
-      this.log.info("Final mode sending for fan speed: " + mode);
+      this.log.debug("Final mode sending for fan speed: " + mode);
       this.buffer[1] = -122;
       this.buffer[3] = acId;
       this.buffer[4] = -126;
