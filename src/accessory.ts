@@ -182,7 +182,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
           let zoneObj = this.aircon!.zones[zone.zoneId];
           if (zoneObj != undefined) {
             let activeState = zoneObj.status;
-            this.log("Zone status for '" + zone.name + "' from API is: " + activeState);
+            this.log.debug("Zone status for '" + zone.name + "' from API is: " + activeState);
             if (activeState) {
               callback(undefined, true);
             } else {
