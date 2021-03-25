@@ -1,6 +1,6 @@
 {
   "name": "homebridge-airtouch3-airconditioner",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "An integration for the AirTouch 3 Air Conditioner",
   "main": "dist/accessory.js",
   "scripts": {
