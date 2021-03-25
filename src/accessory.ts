@@ -119,8 +119,9 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     })
 
     this.service.getCharacteristic(hap.Characteristic.RotationSpeed)
+    .setProps({ minValue: 0, maxValue: 4, minStep: 1 })
     .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
-        callback(undefined, 8);
+        callback(undefined, 4);
     })
     .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
         callback(undefined);
