@@ -67,6 +67,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   private commandQueue = new Queue<AirTouchMessage>();
 
   private readonly service: Service;
+  private readonly fanService: Service;
   private readonly informationService: Service;
 
   constructor(log: Logging, config: AccessoryConfig, api: API) {
@@ -130,11 +131,14 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
       this.handleHeatingTemperatureSet(callback, value as string);
     })
 
-    let fan = this.service.getCharacteristic(hap.Characteristic.RotationSpeed)
-    if (fan == undefined) {
-      fan = this.service.addCharacteristic(hap.Characteristic.RotationSpeed)
+    this.fanService = new hap.Service.Fan(this.name + " fan");
+
+    let rotationSpeed = this.fanService.getCharacteristic(hap.Characteristic.RotationSpeed)
+    if (rotationSpeed == undefined) {
+      rotationSpeed = this.fanService.addCharacteristic(hap.Characteristic.RotationSpeed)
     }
-    fan
+
+    rotationSpeed
     .setProps({ minValue: 0, maxValue: 4, minStep: 1 })
     .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
         callback(undefined, 4);
@@ -142,6 +146,15 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
         callback(undefined);
     })
+
+    this.fanService.getCharacteristic(this.Characteristic.On)
+    .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
+        callback(undefined, true);
+    })
+    .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+        callback(undefined);
+    })
+
 
 
 
@@ -437,6 +450,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   getServices(): Service[] {
     let serviceArray = new Array<Service>();
     serviceArray.push(this.informationService);
+    serviceArray.push(this.fanService);
     serviceArray.push(this.service);
 
     //Add zone switches..
