@@ -147,7 +147,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
         callback(undefined);
     })
 
-    this.fanService.getCharacteristic(this.Characteristic.On)
+    this.fanService.getCharacteristic(hap.Characteristic.On)
     .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
         callback(undefined, true);
     })
