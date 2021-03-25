@@ -150,7 +150,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     })
     .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
         this.log.info("Setting fan speed to " + value);
-        this.setFanSpeed(value);
+        this.setFanSpeed(value.parseInt());
         callback(undefined);
     })
 

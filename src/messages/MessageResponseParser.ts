@@ -109,7 +109,7 @@ export class MessageResponseParser {
 
     //Fan speed
     aircon.fanSpeed = this.responseBuffer[this.FanSpeed] & 15;
-    switch (aircon.fanspeed)
+    switch (aircon.fanSpeed)
     {
         case 0:
             aircon.fanSpeed = 0;

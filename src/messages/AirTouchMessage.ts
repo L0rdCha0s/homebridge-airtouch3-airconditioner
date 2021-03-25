@@ -172,7 +172,7 @@ export class AirTouchMessage {
 
       if (acId == 0 && brandId == 15)
             {
-                switch (currentMode)
+                switch (mode)
                 {
                     case 0:
                         mode = 4;
@@ -182,7 +182,7 @@ export class AirTouchMessage {
             //if ((ExchData.GetSelectedAC() == 0 && ExchData.GetAC1().GetBrand() == 2) || (ExchData.GetSelectedAC() == 1 && ExchData.GetAC2().GetBrand() == 2))
             if (acId == 0 && brandId == 2)
             {
-                switch (currentMode)
+                switch (mode)
                 {
                     case 0:
                         mode = 0;
