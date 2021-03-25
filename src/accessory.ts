@@ -120,7 +120,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
 
     let fan = this.service.getCharacteristic(hap.Characteristic.RotationSpeed)
     if (fan == undefined) {
-      fan = this.server.addCharacteristic(hap.Characteristic.RotationSpeed)
+      fan = this.service.addCharacteristic(hap.Characteristic.RotationSpeed)
     }
     fan
     .setProps({ minValue: 0, maxValue: 4, minStep: 1 })
