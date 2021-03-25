@@ -233,9 +233,9 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
         let message = this.commandQueue.pop();
         if (message != undefined) {
           const total = await this.promiseSocket.write(Buffer.from(message.buffer.buffer));
-          this.log.info("Bytes written: " + total);
+          this.log.debug("Bytes written: " + total);
         } else {
-          this.log.info("No outbound commands to run on airtouch");
+          this.log.debug("No outbound commands to run on airtouch");
         }
     }, 2000);
 
