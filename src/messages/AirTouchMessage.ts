@@ -18,7 +18,7 @@ export class AirTouchMessage {
      this.buffer = new Int8Array(13);
      this.sumByte = new Int8Array(13);
      this.log = log;
-     this.isTemp = false;
+     this._isTemp = false;
    }
 
   resetMessage() {
