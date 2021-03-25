@@ -218,6 +218,8 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
           this.log.info("No outbound commands to run on airtouch");
         }
     }, 2000);
+
+
     //Now, connect to airtouch..
     this.connectToServer();
   }
