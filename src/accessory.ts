@@ -139,12 +139,16 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     }
 
     rotationSpeed
-    .setProps({ minValue: 1, maxValue: 4, minStep: 1 })
+    .setProps({ minValue: 0, maxValue: 3, minStep: 1 })
     .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
-        callback(undefined, 4);
+        let speed = this.aircon.fanSpeed;
+        //Interpret airtouch speed 5 (auto) as fan 'off'
+        if (speed = 5) speed = 0;
+        callback(undefined, speed);
     })
     .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
         this.log.info("Setting fan speed to " + value);
+        this.setFanSpeed(value);
         callback(undefined);
     })
 
@@ -532,6 +536,18 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     bufferTest.printHexCode();
     this.commandQueue.push(bufferTest);
 
+  }
+
+  async setFanSpeed(speed: number) {
+    //We interpret mode == 0 as auto, which to airtouch is 5.  Use that
+    if (speed = 0) speed = 5;
+
+    this.log.info("Sending AC fan speed to " + number);
+
+    let bufferTest = new AirTouchMessage(this.log);
+    bufferTest.setFanSpeed(this.airConId, this.aircon!.brandId, speed);
+    bufferTest.printHexCode();
+    this.commandQueue.push(bufferTest);
   }
 
    stackTrace() {

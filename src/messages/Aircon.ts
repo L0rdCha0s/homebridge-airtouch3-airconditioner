@@ -19,6 +19,14 @@ export class Aircon {
     this._status = v;
   }
 
+  private _fanSpeed : number;
+  public get fanSpeed() : number {
+    return this._fanSpeed;
+  }
+  public set fanSpeed(v : number) {
+    this._fanSpeed = v;
+  }
+
   constructor() {
     this._zones = new Array<Zone>();
     this._status = false;
@@ -26,6 +34,7 @@ export class Aircon {
     this._desiredTemperature = 0;
     this._brandId = 0;
     this._mode = AcMode.AUTO;
+    this._fanSpeed = 0;
   }
 
   private _roomTemperature : number;

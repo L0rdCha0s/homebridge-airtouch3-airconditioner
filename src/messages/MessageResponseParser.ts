@@ -107,6 +107,20 @@ export class MessageResponseParser {
     aircon.brandId = this.responseBuffer[this.AirconBrandId];
     this.log.debug("Air conditioner brand id is: " + aircon.brandId);
 
+    //Fan speed
+    aircon.fanSpeed = this.responseBuffer[this.FanSpeed] & 15;
+    switch (aircon.fanspeed)
+    {
+        case 0:
+            aircon.fanSpeed = 0;
+            break;
+        case 4:
+            aircon.fanSpeed = 0;
+            break;
+    }
+
+    this.log.info("Fan speed is set to " + aircon.fanSpeed);
+
     aircon.zones = this.parseZones();
 
     return aircon;

@@ -163,4 +163,43 @@ export class AirTouchMessage {
             this.buffer[5] = mode;
             this.buffer[12] = this.calcChecksum();
     }
+
+
+    setFanSpeed(acId: number, brandId: number, inMode: number) {
+      this.resetMessage();
+
+      let mode = inMode;
+
+      if (acId == 0 && acBrandId == 15)
+            {
+                switch (currentMode)
+                {
+                    case 0:
+                        mode = 4;
+                        break;
+                }
+            }
+            //if ((ExchData.GetSelectedAC() == 0 && ExchData.GetAC1().GetBrand() == 2) || (ExchData.GetSelectedAC() == 1 && ExchData.GetAC2().GetBrand() == 2))
+            if (acId == 0 && acBrandId == 2)
+            {
+                switch (currentMode)
+                {
+                    case 0:
+                        mode = 0;
+                        break;
+                    case 4:
+                        mode = 1;
+                        break;
+                    default:
+                        mode++;
+                        break;
+                }
+            }
+
+      this.buffer[1] = -122;
+      this.buffer[3] = acId;
+      this.buffer[4] = -126;
+      this.buffer[5] = mode;
+      this.buffer[12] = this.calcChecksum();
+    }
 }
