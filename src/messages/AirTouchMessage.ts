@@ -6,11 +6,19 @@ export class AirTouchMessage {
    buffer: Int8Array;
    sumByte: Int8Array;
    log: Logging;
+   private _isTemp : boolean;
+   public get isTemp() : boolean {
+     return this._isTemp;
+   }
+   public set isTemp(v : boolean) {
+     this._isTemp = v;
+   }
 
    constructor(log: Logging) {
      this.buffer = new Int8Array(13);
      this.sumByte = new Int8Array(13);
      this.log = log;
+     this.isTemp = false;
    }
 
   resetMessage() {

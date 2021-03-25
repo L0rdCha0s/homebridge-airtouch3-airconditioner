@@ -46,6 +46,13 @@ class Queue<T> {
   pop(): T | undefined {
     return this._store.shift();
   }
+
+  clearTemps() {
+    var i = this._store.length;
+    while (i--) {
+      if (this._store[i].isTemp) this._store.splice(i,1);
+    }
+  }
 }
 
 
@@ -161,9 +168,6 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
         callback(undefined);
     })
-
-
-
 
     //zones
     //Get zone list via API first, then create one switch per zone
@@ -408,6 +412,9 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
 
   async setTargetTemperature(temperature: number, callback: Function) : Promise<number> {
     this.log.debug('Setting target temperature: ' + temperature);
+
+    //Clear temperatures, as we're about to change them all
+    this.commandQueue.clearTemps();
 
     //Callback before working on it, because it may take a while and hit homekit's response time limit
     callback(undefined);
