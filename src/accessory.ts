@@ -534,6 +534,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     let bufferTest = new AirTouchMessage(this.log);
     bufferTest.setFan(zoneId, incDec);
     bufferTest.printHexCode();
+    bufferTest.isTemp = true;
     this.commandQueue.push(bufferTest);
 
   }
