@@ -118,7 +118,11 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
       this.handleHeatingTemperatureSet(callback, value as string);
     })
 
-    this.service.getCharacteristic(hap.Characteristic.RotationSpeed)
+    let fan = this.service.getCharacteristic(hap.Characteristic.RotationSpeed)
+    if (fan == undefined) {
+      fan = this.server.addCharacteristic(hap.Characteristic.RotationSpeed)
+    }
+    fan
     .setProps({ minValue: 0, maxValue: 4, minStep: 1 })
     .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
         callback(undefined, 4);
