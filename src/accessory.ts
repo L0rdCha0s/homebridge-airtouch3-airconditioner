@@ -38,7 +38,7 @@ class Zone {
   }
 }
 
-class Queue<T> {
+class Queue<T extends AirTouchMessage> {
   _store: T[] = [];
   push(val: T) {
     this._store.push(val);
