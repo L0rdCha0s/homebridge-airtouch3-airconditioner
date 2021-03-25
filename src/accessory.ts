@@ -139,11 +139,12 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
     }
 
     rotationSpeed
-    .setProps({ minValue: 0, maxValue: 4, minStep: 1 })
+    .setProps({ minValue: 1, maxValue: 4, minStep: 1 })
     .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
         callback(undefined, 4);
     })
     .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+        this.log.info("Setting fan speed to " + value);
         callback(undefined);
     })
 
