@@ -118,6 +118,16 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
       this.handleHeatingTemperatureSet(callback, value as string);
     })
 
+    this.service.getCharacteristic(hap.Characteristic.RotationSpeed)
+    .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
+        callback(undefined, 8);
+    })
+    .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+        callback(undefined);
+    })
+
+
+
     //zones
     //Get zone list via API first, then create one switch per zone
     config.zones.map((zone : any) => {

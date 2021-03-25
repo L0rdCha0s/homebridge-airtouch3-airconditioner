@@ -1,7 +1,7 @@
 {
   "name": "homebridge-airtouch3-airconditioner",
   "version": "1.2.0",
-  "description": "An integration with the vzduch-dotek AirTouch v3 API",
+  "description": "An integration for the AirTouch 3 Air Conditioner",
   "main": "dist/accessory.js",
   "scripts": {
     "clean": "rimraf ./dist",
