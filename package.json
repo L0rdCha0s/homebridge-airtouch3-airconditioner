@@ -31,12 +31,14 @@
   },
   "devDependencies": {
     "@types/node": "10.17.19",
-    "typescript": "^3.8.3",
+    "homebridge": "^1.6.0",
     "rimraf": "^3.0.2",
-    "homebridge": "^1.0.4"
+    "typescript": "^3.8.3"
   },
   "dependencies": {
     "axios": "^0.21.1",
-    "promise-socket": "^7.0.0"
+    "net": "^1.0.2",
+    "promise-socket": "^7.0.0",
+    "promise-writable": "^6.0.0"
   }
 }

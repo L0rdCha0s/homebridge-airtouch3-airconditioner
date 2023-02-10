@@ -12,7 +12,7 @@ import {
 } from "homebridge";
 
 import net from "net"
-import PromiseSocket from "promise-socket"
+import {PromiseSocket, TimeoutError} from "promise-socket"
 import PromiseWritable from "promise-writable"
 import { AirTouchMessage } from "./messages/AirTouchMessage";
 import { MessageResponseParser } from "./messages/MessageResponseParser"
@@ -67,6 +67,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   private switchOn = false;
   private coolingTemperature = 24;
   private heatingTemperature = 15;
+  private connected : boolean = false;
   private airConId = 0;
   private airtouchHost : string;
   private airtouchPort : number = 8899;
@@ -234,13 +235,23 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
 
     //Start outbound command queue runner
     setInterval(async () => {
+      if (this.connected == true) {
         let message = this.commandQueue.pop();
         if (message != undefined) {
-          const total = await this.promiseSocket.write(Buffer.from(message.buffer.buffer));
-          this.log.debug("Bytes written: " + total);
+
+          try {
+            const total = await this.promiseSocket.write(Buffer.from(message.buffer.buffer));
+            this.log.debug("Bytes written: " + total);
+          } catch (e) {
+            this.log.info("Error writing to socket - closing");
+            this.connected = false;
+          }
         } else {
           this.log.debug("No outbound commands to run on airtouch");
         }
+      } else {
+        this.log.debug("Can't process AirTouch command queue: not connected");
+      }
     }, 1000);
 
 
@@ -475,13 +486,23 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
 
   async connectToServer() : Promise<void> {
 
-    // promiseSocket.setTimeout(1000);
-    await this.promiseSocket.connect(this.airtouchPort, this.airtouchHost)
+    this.log.info("Connecting to airtouch at : " + this.airtouchHost + ":" + this.airtouchPort);
+
+    // this.promiseSocket.setTimeout(3000);
+    try {
+      await this.promiseSocket.connect(this.airtouchPort, this.airtouchHost)
+    } catch (e) {
+        this.log.info("Socket timeout: couldn't connect to " + this.airtouchHost + ":" + this.airtouchPort);
+        this.log.info((<Error>e).message);//conversion to Error type
+        this.connected = false;
+        return;
+    }
 
     this.log.info("Connected to airtouch at " + this.airtouchHost + ":" + this.airtouchPort);
+    this.connected = true;
 
     this.socket.on('data', (data) => {
-    this.log.debug('Received: ' + data.length);
+      this.log.debug('Received: ' + data.length);
 
       let messageResponseParser = new MessageResponseParser(new Int8Array(data.buffer), this.log);
       this.aircon = messageResponseParser.parse();
@@ -489,8 +510,20 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
 
     this.socket.on('close', async (e) => {
       this.log.debug("********** AirTouch3 disconnected, reconnecting..");
-      await this.promiseSocket.connect(this.airtouchPort, this.airtouchHost);
+      this.connected = false;
     });
+
+    //Timer to reconnect
+    setInterval(async() => {
+	if (this.connected == false) {
+          this.log.info("Reconnecting to airtouch..");
+          await this.promiseSocket.connect(this.airtouchPort, this.airtouchHost);
+	} else {
+	  this.log.debug("Connected to airtouch already");
+	}
+
+
+    }, 10000);
 
     //Timer to send init message
     setInterval(async () => {
