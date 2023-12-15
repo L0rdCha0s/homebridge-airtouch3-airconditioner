@@ -1,6 +1,6 @@
 {
   "name": "homebridge-airtouch3-airconditioner",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "An integration for the AirTouch 3 Air Conditioner",
   "main": "dist/accessory.js",
   "scripts": {
@@ -31,9 +31,9 @@
   },
   "devDependencies": {
     "@types/node": "10.17.19",
-    "homebridge": "^1.6.0",
     "rimraf": "^3.0.2",
-    "typescript": "^3.8.3"
+    "typescript": "^5.3.3",
+    "homebridge": "^1.7.0"
   },
   "dependencies": {
     "axios": "^0.21.1",

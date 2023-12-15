@@ -7,6 +7,7 @@ import { AcMode } from "./enums/AcMode"
 import {
   Logging
 } from "homebridge";
+import { Sensor } from "./Sensor"
 
 export class MessageResponseParser {
   readonly GroupNameStart : number = 104;
@@ -87,9 +88,6 @@ export class MessageResponseParser {
     }
     this.log.debug("Unit name is: ''" + unitName + "'");
 
-    aircon.roomTemperature = this.responseBuffer[this.RoomTemperature];
-    this.log.info("Room temperature is: " + aircon.roomTemperature);
-
     //All except most significant bit
     aircon.desiredTemperature = this.responseBuffer[this.DesiredTemperature] & 127;
 
@@ -121,12 +119,52 @@ export class MessageResponseParser {
 
     this.log.debug("Fan speed is set to " + aircon.fanSpeed);
 
-    aircon.zones = this.parseZones();
+    //Get sensors..
+    aircon.sensors = this.parseSensors();
+
+    aircon.zones = this.parseZones(aircon);
+
+    let roomTemperature = 0;
+    let roomTemperatureZones = 0;
+    for (let i=0;i<aircon.zones.length; i++) {
+      if (aircon.zones[i].sensor && aircon.zones[i].sensor?.isAvailable) {
+        roomTemperatureZones++;
+        roomTemperature += aircon.zones[i].sensor!.currentTemperature;
+
+      } else {
+        this.log.debug(`Zone ${i} doesn't have a sensor`);
+      }
+    }
+    aircon.roomTemperature = 1.0 * roomTemperature / roomTemperatureZones;
+    this.log.info("Room temperature is: " + aircon.roomTemperature);
+
 
     return aircon;
   }
 
-  public parseZones() : Array<Zone> {
+  parseSensors(): Array<Sensor> {
+    const sensors = new Array<Sensor>();
+      for (let i = 0; i < 32; i++) {
+        const sensor = new Sensor();
+
+        
+        this.log.debug(`Sensor ${i} : ` + this.responseBuffer[this.SensorDataStart + i].toString(2));
+
+        //Temperature - highest 5 bits
+        const temp = this.responseBuffer[this.SensorDataStart + i] & 127;
+        this.log.debug(`Sensor ${i} temp is ` + temp);
+
+        sensor.currentTemperature = temp;
+        sensor.isAvailable = this.responseBuffer[this.SensorDataStart + i] & 1 ? true : false;
+
+        this.log.debug(`Sensor ${i} IsAvailable: ${sensor.isAvailable}`);
+        sensors.push(sensor);
+      }
+
+      return sensors;
+  }
+
+  public parseZones(aircon: Aircon) : Array<Zone> {
      let zoneData = new Int8Array(16);
      let groupData = new Int8Array(16);
      let groupNames = new Int8Array(128);
@@ -160,8 +198,17 @@ export class MessageResponseParser {
      let numberOfZones = this.responseBuffer[this.NumberOfZones];
      this.log.info("Number of zones: " + numberOfZones);
 
+
+
      for (let i = 0; i < numberOfZones; i++) {
         let zone = new Zone(0);
+
+        if (aircon.sensors[i].isAvailable) {
+          zone.sensor = aircon.sensors[i];
+        } else if (aircon.sensors[i+1].isAvailable) {
+          zone.sensor = aircon.sensors[i+1];
+        }
+         
 
         let zoneName = "";
         for (let x = i * 8; x < (i + 1) * 8; x++) {

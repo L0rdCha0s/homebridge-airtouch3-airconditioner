@@ -1,3 +1,4 @@
+import { Sensor } from "./Sensor";
 import { ZoneStatus } from "./enums/ZoneStatus"
 
 export class Zone {
@@ -41,8 +42,20 @@ export class Zone {
      this._desiredTemperature = v;
    }
 
+   private _sensor: Sensor | null;
+   public get sensor() : Sensor | null {
+    return this._sensor;
+   }
+
+   public set sensor(sensor: Sensor) {
+    this._sensor = sensor;
+   }
+   
+
+
    constructor(touchPadTemperature : number) {
        this._touchPadTemperature = touchPadTemperature;
+       this._sensor = null;
        this._desiredTemperature = 0;
        this._name = "";
        this._status = ZoneStatus.ZoneOff;

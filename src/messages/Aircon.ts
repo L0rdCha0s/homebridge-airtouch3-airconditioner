@@ -11,6 +11,14 @@ export class Aircon {
     this._zones = v;
   }
 
+  private _sensors : Array<Sensor>;
+  public get sensors() : Array<Sensor> {
+    return this._sensors;
+  }
+  public set sensors(v : Array<Sensor>) {
+    this._sensors = v;
+  }
+
   private _status : boolean;
   public get status() : boolean {
     return this._status;
@@ -29,6 +37,7 @@ export class Aircon {
 
   constructor() {
     this._zones = new Array<Zone>();
+    this._sensors = new Array<Sensor>();
     this._status = false;
     this._roomTemperature = 0;
     this._desiredTemperature = 0;
