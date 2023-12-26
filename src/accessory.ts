@@ -2,6 +2,7 @@ import {
   AccessoryConfig,
   AccessoryPlugin,
   API,
+  Characteristic,
   CharacteristicEventTypes,
   CharacteristicGetCallback,
   CharacteristicSetCallback,
@@ -73,6 +74,7 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   private airtouchPort : number = 8899;
   private aircon: Aircon | undefined;
   private commandQueue = new Queue<AirTouchMessage>();
+  private api: API;
 
   private readonly service: Service;
   private readonly fanService: Service;
@@ -81,6 +83,9 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
   constructor(log: Logging, config: AccessoryConfig, api: API) {
     this.log = log;
     this.name = config.name;
+
+    this.api = api;
+
     this.zoneSwitches = new Array<Zone>();
     if (config.airConId) {
       this.log.debug("Selecting override airconditioner ID: " + config.airConId);
@@ -325,7 +330,9 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
       let modeCallback : any = mode;
 
       if (mode == AcMode.COOL) {
-        modeCallback = 2; //Airtouch modes overlap 1-1, except for cool -which is '2' not '4'
+        modeCallback = this.api.hap.Characteristic.CurrentHeaterCoolerState.COOLING; //Airtouch modes overlap 1-1, except for cool -which is '2' not '4'
+      } else if (mode == AcMode.HEAT) {
+        modeCallback = this.api.hap.Characteristic.CurrentHeaterCoolerState.HEATING;
       }
       callback(undefined, modeCallback);
     } else {
@@ -347,7 +354,9 @@ class Airtouch3Airconditioner implements AccessoryPlugin {
       let modeCallback : any = mode;
 
       if (mode == AcMode.COOL) {
-        modeCallback = 2; //Airtouch modes overlap 1-1, except for cool -which is '2' not '4'
+        modeCallback = this.api.hap.Characteristic.TargetHeaterCoolerState.COOL;
+      } else if (AcMode.HEAT) {
+        modeCallback = this.api.hap.Characteristic.TargetHeaterCoolerState.HEAT;
       }
       callback(undefined, modeCallback);
     } else {

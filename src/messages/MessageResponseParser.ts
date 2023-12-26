@@ -62,6 +62,11 @@ export class MessageResponseParser {
    return (dec >>> 0).toString(2);
   }
 
+  private print8BitBinary(value) {
+    let binary = (value & 0xFF).toString(2); // Mask to 8 bits and convert to binary
+    return binary.padStart(8, '0'); // Pad with zeros to ensure 8 digits
+  }
+
   public parse() : Aircon {
     this.log.debug("Length of response: " + this.responseBuffer.length);
 
@@ -148,14 +153,15 @@ export class MessageResponseParser {
         const sensor = new Sensor();
 
         
-        this.log.debug(`Sensor ${i} : ` + this.responseBuffer[this.SensorDataStart + i].toString(2));
+        this.log.debug(`Sensor ${i} : ` + this.print8BitBinary(this.responseBuffer[this.SensorDataStart + i]));
+        const binValue = this.print8BitBinary(this.responseBuffer[this.SensorDataStart + i]);
 
-        //Temperature - highest 5 bits
-        const temp = this.responseBuffer[this.SensorDataStart + i] & 127;
+        //Temperature - bits 3-8
+        const temp = parseInt(binValue.slice(2),2);
         this.log.debug(`Sensor ${i} temp is ` + temp);
 
         sensor.currentTemperature = temp;
-        sensor.isAvailable = this.responseBuffer[this.SensorDataStart + i] & 1 ? true : false;
+        sensor.isAvailable = binValue.charAt(0) == '1';
 
         this.log.debug(`Sensor ${i} IsAvailable: ${sensor.isAvailable}`);
         sensors.push(sensor);
